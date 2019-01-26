@@ -30,7 +30,7 @@ namespace MixinSdk.Bean
         public string creator_id { get; set; }
     }
 
-    public class PinInfo
+    public class UserInfo
     {
         public string type { get; set; }
         public string user_id { get; set; }
@@ -56,6 +56,12 @@ namespace MixinSdk.Bean
         {
             return JsonConvert.SerializeObject(this);
         }
+    }
+
+    public class NewUser
+    {
+        public string full_name { get; set; }
+        public string session_secret { get; set; }
     }
 
 }

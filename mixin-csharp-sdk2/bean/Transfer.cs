@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace MixinSdk.Bean
 {
     public class TransferReq
@@ -11,7 +13,7 @@ namespace MixinSdk.Bean
         public string trace_id { get; set; }
     }
 
-    public class TransferRsp
+    public class Transfer
     {
         public string type { get; set; }
         public string snapshot_id { get; set; }
@@ -21,5 +23,10 @@ namespace MixinSdk.Bean
         public string trace_id { get; set; }
         public string memo { get; set; }
         public string created_at { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

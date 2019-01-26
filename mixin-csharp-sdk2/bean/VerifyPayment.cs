@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace MixinSdk.Bean
 {
     public class VerifyPaymentReq
@@ -7,6 +9,11 @@ namespace MixinSdk.Bean
         public string asset_id { get; set; }
         public string opponent_id { get; set; }
         public string trace_id { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
     public class Recipient
@@ -28,6 +35,11 @@ namespace MixinSdk.Bean
         public Asset asset { get; set; }
         public string amount { get; set; }
         public string status { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
 }

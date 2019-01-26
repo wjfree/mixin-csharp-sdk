@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace MixinSdk.Bean
 {
     public class Asset
@@ -20,5 +22,10 @@ namespace MixinSdk.Bean
         public string asset_key { get; set; }
         public int confirmations { get; set; }
         public double capitalization { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }
