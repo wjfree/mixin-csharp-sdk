@@ -58,6 +58,23 @@ namespace MixinSdk.Bean
         }
     }
 
+    public class UserPerference
+    {
+        public string receive_message_source { get; set; }
+        public string accept_conversation_source { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    public class UserProfile
+    {
+        public string full_name { get; set; }
+        public string avatar_base64 { get; set; }
+    }
+
     public class NewUser
     {
         public string full_name { get; set; }

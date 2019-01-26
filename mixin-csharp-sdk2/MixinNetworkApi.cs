@@ -7,44 +7,9 @@ using System.Collections.Generic;
 
 namespace MixinSdk
 {
-    public class MixinNetworkApi
+    public class MixinNetworkApi : MixinApi
     {
-        private MixinUserConfig userConfig = new MixinUserConfig();
-        private RSACryptoServiceProvider priKey;
-        private RsaPrivateCrtKeyParameters rsaParameters;
-        private bool isInited = false;
-        RestClient client = new RestClient(Config.MIXIN_API_URL);
-
-        public MixinNetworkApi()
-        {
-        }
-
-        public void Init(string ClientId, string ClientSecret, string SessionId, string PinToken, string PrivateKey)
-        {
-            userConfig.ClientId = ClientId;
-            userConfig.ClientSecret = ClientSecret;
-            userConfig.SessionId = SessionId;
-            userConfig.PinToken = PinToken;
-            userConfig.PrivateKey = PrivateKey;
-
-            priKey = RSA.RSA_PEM.FromPEM(userConfig.PrivateKey);
-
-
-            var rsaParams = priKey.ExportParameters(true);
-            var Modulus = mixin_utils.makeBigInt(rsaParams.Modulus);
-            var Exponent = mixin_utils.makeBigInt(rsaParams.Exponent);
-            var D = mixin_utils.makeBigInt(rsaParams.D);
-            var P = mixin_utils.makeBigInt(rsaParams.P);
-            var Q = mixin_utils.makeBigInt(rsaParams.Q);
-            var DP = mixin_utils.makeBigInt(rsaParams.DP);
-            var DQ = mixin_utils.makeBigInt(rsaParams.DQ);
-            var InverseQ = mixin_utils.makeBigInt(rsaParams.InverseQ);
-            rsaParameters = new RsaPrivateCrtKeyParameters(Modulus, Exponent, D, P, Q, DP, DQ, InverseQ);
-
-            isInited = true;
-        }
-
-        public object CreatePIN(string oldPin, string newPin)
+        public UserInfo CreatePIN(string oldPin, string newPin)
         {
             if (!isInited)
             {
@@ -110,7 +75,7 @@ namespace MixinSdk
 
             var response = client.Execute<Data>(request);
 
-            if(null == response.Data.data)
+            if (null == response.Data.data)
             {
                 var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
                 throw new MixinException(errorinfo);
@@ -239,9 +204,39 @@ namespace MixinSdk
             return rz;
         }
 
-        public object DeleteAddress()
+        public object DeleteAddress(string pin, string addressId)
         {
-            return null;
+            if (!isInited)
+            {
+                return null;
+            }
+
+            string req = "/addresses/" + addressId + "/delete";
+
+            var request = new RestRequest(req, Method.POST);
+
+            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+
+            VerifyPinReq p = new VerifyPinReq();
+            p.pin = pinBlock;
+
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(p);
+
+            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+
+            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
+            jwtAuth.Authenticate(client, request);
+
+            var response = client.Execute<Data>(request);
+
+            if (null == response.Data.data)
+            {
+                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
+                throw new MixinException(errorinfo);
+            }
+
+            return response.Data;
         }
 
         public Address ReadAddress(string addressId)
@@ -284,7 +279,7 @@ namespace MixinSdk
             }
 
             string req = "/assets/" + assetId + "/addresses";
-            
+
 
             var request = new RestRequest(req + assetId, Method.GET);
 
@@ -436,7 +431,7 @@ namespace MixinSdk
                 return null;
             }
 
-            string req = "/transfers/trace/"+traceId;
+            string req = "/transfers/trace/" + traceId;
 
             var request = new RestRequest(req, Method.GET);
 
@@ -537,7 +532,7 @@ namespace MixinSdk
             {
                 request.AddParameter("asset", assetId);
             }
-            if(!string.IsNullOrEmpty(order))
+            if (!string.IsNullOrEmpty(order))
             {
                 request.AddParameter("order", order);
             }
@@ -563,7 +558,7 @@ namespace MixinSdk
             return rz;
         }
 
-        public Asset NetworkSnapshot( string snapshotId, bool isAuth)
+        public Asset NetworkSnapshot(string snapshotId, bool isAuth)
         {
             if (!isInited)
             {
@@ -679,7 +674,7 @@ namespace MixinSdk
             }
 
             const string req = "/users";
-            
+
             var request = new RestRequest(req, Method.POST);
 
             NewUser p = new NewUser
