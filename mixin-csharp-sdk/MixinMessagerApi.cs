@@ -399,7 +399,6 @@ namespace MixinSdk
 
 
             request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(p);
 
             string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 

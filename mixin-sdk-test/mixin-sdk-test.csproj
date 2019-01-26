@@ -6,6 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\mixin-csharp-sdk2\mixin-csharp-sdk.csproj" />
+    <ProjectReference Include="..\mixin-csharp-sdk\mixin-csharp-sdk.csproj" />
   </ItemGroup>
 </Project>
