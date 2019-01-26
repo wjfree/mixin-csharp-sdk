@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-sdk-test", "mixin-sdk-test\mixin-sdk-test.csproj", "{88DD0CEE-2F92-4787-B88F-6F914075441B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-csharp-sdk", "mixin-csharp-sdk2\mixin-csharp-sdk.csproj", "{0C6A22BE-7059-45BC-BEBB-A40F2DE46B63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-csharp-sdk", "mixin-csharp-sdk\mixin-csharp-sdk.csproj", "{0C6A22BE-7059-45BC-BEBB-A40F2DE46B63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
