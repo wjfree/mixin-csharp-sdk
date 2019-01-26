@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace mixincsharpsdk.bean
+namespace MixinSdk.Bean
 {
     public class VerifyPinReq
     {
@@ -50,6 +51,11 @@ namespace mixincsharpsdk.bean
         public bool has_pin { get; set; }
         public string receive_message_source { get; set; }
         public string accept_conversation_source { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
 }
