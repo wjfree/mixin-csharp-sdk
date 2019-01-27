@@ -286,7 +286,8 @@ namespace MixinSdk
 
         private string UniqueConversationId(string userId, string recipientId)
         {
-
+            System.Console.WriteLine("a = " + userId);
+            System.Console.WriteLine("b = "+ recipientId);
             var minId = userId;
             var maxId = recipientId;
 
@@ -301,8 +302,17 @@ namespace MixinSdk
             sum[6] = (byte)((sum[6] & 0x0f) | 0x30);
             sum[8] = (byte)((sum[8] & 0x3f) | 0x80);
 
-            var uuid = new Guid(sum);
-            return uuid.ToString();
+            var s = BitConverter.ToString(sum);
+            s = s.Replace("-", "");
+
+            s = s.Substring(0, 8) + "-" + s.Substring(8);
+            s = s.Substring(0, 13) + "-" + s.Substring(13);
+            s = s.Substring(0, 18) + "-" + s.Substring(18);
+            s = s.Substring(0, 23) + "-" + s.Substring(23);
+            s = s.ToLower();
+
+            System.Console.WriteLine("UUID = " + s);
+            return s;
         }
 
 
@@ -316,9 +326,9 @@ namespace MixinSdk
             }
 
             string conversationId = Guid.NewGuid().ToString();
-            if ("GROUP".Equals(category))
+            if ("CONTACT".Equals(category))
             {
-                // todo : conversationId = UniqueConversationId();
+                conversationId = UniqueConversationId(userConfig.ClientId, participants[0].user_id);
             }
 
 
