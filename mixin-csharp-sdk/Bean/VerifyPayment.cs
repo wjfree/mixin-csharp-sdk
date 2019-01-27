@@ -27,6 +27,11 @@ namespace MixinSdk.Bean
         public DateTime mute_until { get; set; }
         public string created_at { get; set; }
         public bool is_verified { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 
     public class VerifyPaymentRsp

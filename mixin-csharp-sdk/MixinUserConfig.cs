@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 namespace MixinSdk
 {
     public class MixinUserConfig
@@ -8,6 +9,11 @@ namespace MixinSdk
         public string SessionId { get; set; }
         public string PinToken { get; set; }
         public string PrivateKey { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }
 

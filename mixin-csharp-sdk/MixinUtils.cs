@@ -13,9 +13,34 @@ using Org.BouncyCastle.Math;
 
 namespace MixinSdk
 {
-    public class mixin_utils
+    public static class MixinUtils
     {
         private static Random random = new Random();
+
+        private static UInt64 iterator = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        private static UInt64 getIterator()
+        {
+            iterator++;
+            return iterator;
+        }
+
+        private static string BCD2ASC(byte[] bBcd)
+        {
+            string ret = "";
+            foreach (byte b in bBcd)
+            {
+                ret += b.ToString("x2");
+            }
+            return ret;
+        }
+
+
+        public static long ToUnixTime(DateTime datetime)
+        {
+            System.DateTime startTime = new System.DateTime(1970, 1, 1); // 当地时区
+            long timeStamp = (long)(datetime - startTime).TotalSeconds; // 相差秒数
+            return timeStamp;
+        }
 
         public static string GenJwtAuthCode(string method, string uri, string body, string clientId, string sessionId, RSACryptoServiceProvider privateKey)
         {
@@ -25,7 +50,6 @@ namespace MixinSdk
             using (SHA256 mySHA256 = SHA256.Create())
             {
                 var signData = method + uri + body;
-                System.Console.WriteLine(signData);
                 bsha256 = mySHA256.ComputeHash(Encoding.UTF8.GetBytes(signData));
             }
 
@@ -33,10 +57,10 @@ namespace MixinSdk
                         {
                             {"uid", clientId },
                             {"sid", sessionId },
-                            {"iat", Common.ToUnixTime(DateTime.UtcNow)},
-                            {"exp", Common.ToUnixTime(DateTime.UtcNow) + 3600}, //过期时间暂定一小时
+                            {"iat", ToUnixTime(DateTime.UtcNow)},
+                            {"exp", ToUnixTime(DateTime.UtcNow) + 3600}, //过期时间暂定一小时
                             {"jti", System.Guid.NewGuid().ToString()},
-                            {"sig", Common.BCD2ASC(bsha256)}
+                            {"sig", BCD2ASC(bsha256)}
                         };
 
             string token = Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS512);
@@ -61,6 +85,7 @@ namespace MixinSdk
         public static string GenEncrypedPin(string pin, string pinToken, string sessionId, RsaPrivateCrtKeyParameters rsa)
         {
             UInt64 time = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            UInt64 it = getIterator();
 
             var bPinToken = System.Convert.FromBase64String(pinToken);
 
@@ -75,9 +100,10 @@ namespace MixinSdk
 
             var bPin = Encoding.ASCII.GetBytes(pin);
             var btime = BitConverter.GetBytes(time);
+            var biterator = BitConverter.GetBytes(it);
 
 
-            int len = bPin.Length + btime.Length + btime.Length;
+            int len = bPin.Length + btime.Length + biterator.Length;
 
             IBlockCipher cipherAes = new AesEngine();
             int bsize = cipherAes.GetBlockSize();
@@ -92,8 +118,8 @@ namespace MixinSdk
             var blocks = new byte[len];
             System.Array.Copy(bPin, blocks, bPin.Length);
             System.Array.Copy(btime, 0, blocks, bPin.Length, btime.Length);
-            System.Array.Copy(btime, 0, blocks, bPin.Length + btime.Length, btime.Length);
-            System.Array.Copy(bPadding, 0, blocks, bPin.Length + btime.Length + btime.Length, nPadding);
+            System.Array.Copy(biterator, 0, blocks, bPin.Length + btime.Length, biterator.Length);
+            System.Array.Copy(bPadding, 0, blocks, bPin.Length + btime.Length + biterator.Length, nPadding);
 
             var iv = new byte[bsize];
             random.NextBytes(iv);

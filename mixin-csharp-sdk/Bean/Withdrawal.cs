@@ -17,7 +17,7 @@ namespace MixinSdk.Bean
         }
     }
 
-    public class WithDrawalRsp
+    public class WithDrawalInfo
     {
         public string type { get; set; }
         public string snapshot_id { get; set; }

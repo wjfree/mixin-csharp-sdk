@@ -1,9 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Generic;
 using MixinSdk.Bean;
-using Org.BouncyCastle.Crypto.Parameters;
-using RestSharp;
 using Newtonsoft.Json;
-using System.Collections.Generic;
+using RestSharp;
 
 namespace MixinSdk
 {
@@ -11,17 +9,14 @@ namespace MixinSdk
     {
         public UserInfo CreatePIN(string oldPin, string newPin)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/pin/update";
 
             var request = new RestRequest(req, Method.POST);
 
-            var oldPinBlock = mixin_utils.GenEncrypedPin(oldPin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
-            var newPinBlock = mixin_utils.GenEncrypedPin(newPin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var oldPinBlock = MixinUtils.GenEncrypedPin(oldPin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var newPinBlock = MixinUtils.GenEncrypedPin(newPin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             var p = new CreatePinReq();
             p.old_pin = oldPinBlock;
@@ -30,7 +25,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -51,16 +46,13 @@ namespace MixinSdk
 
         public UserInfo VerifyPIN(string pin)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/pin/verify";
 
             var request = new RestRequest(req, Method.POST);
 
-            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var pinBlock = MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             VerifyPinReq p = new VerifyPinReq();
             p.pin = pinBlock;
@@ -68,7 +60,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -88,10 +80,7 @@ namespace MixinSdk
 
         public Asset Deposit(string assetID)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/assets/";
 
@@ -99,7 +88,7 @@ namespace MixinSdk
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req + assetID, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req + assetID, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -117,18 +106,15 @@ namespace MixinSdk
             return rz;
         }
 
-        public object Withdrawal(string addressId, string amount, string pin, string traceId, string memo)
+        public WithDrawalInfo Withdrawal(string addressId, string amount, string pin, string traceId, string memo)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/withdrawals";
 
             var request = new RestRequest(req, Method.POST);
 
-            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var pinBlock = MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             WithDrawalReq p = new WithDrawalReq
             {
@@ -142,7 +128,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -155,23 +141,20 @@ namespace MixinSdk
                 throw new MixinException(errorinfo);
             }
 
-            var rz = JsonConvert.DeserializeObject<WithDrawalRsp>(response.Data.data);
+            var rz = JsonConvert.DeserializeObject<WithDrawalInfo>(response.Data.data);
 
             return rz;
         }
 
         public Address CreateAddress(string assetId, string publicKey, string label, string accountName, string accountTag, string pin)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/addresses";
 
             var request = new RestRequest(req, Method.POST);
 
-            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var pinBlock = MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             CreateAddressReq p = new CreateAddressReq
             {
@@ -186,7 +169,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -204,18 +187,15 @@ namespace MixinSdk
             return rz;
         }
 
-        public object DeleteAddress(string pin, string addressId)
+        public bool DeleteAddress(string pin, string addressId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             string req = "/addresses/" + addressId + "/delete";
 
             var request = new RestRequest(req, Method.POST);
 
-            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var pinBlock = MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             VerifyPinReq p = new VerifyPinReq();
             p.pin = pinBlock;
@@ -223,28 +203,25 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
 
             var response = client.Execute<Data>(request);
 
-            if (null == response.Data.data)
+            if (!response.Content.Equals("{}"))
             {
                 var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
                 throw new MixinException(errorinfo);
             }
 
-            return response.Data;
+            return true;
         }
 
         public Address ReadAddress(string addressId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/addresses/";
 
@@ -252,7 +229,7 @@ namespace MixinSdk
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req + addressId, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req + addressId, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -271,21 +248,17 @@ namespace MixinSdk
 
         }
 
-        public object WithdrawalAddresses(string assetId)
+        public List<Address> WithdrawalAddresses(string assetId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             string req = "/assets/" + assetId + "/addresses";
 
-
-            var request = new RestRequest(req + assetId, Method.GET);
+            var request = new RestRequest(req, Method.GET);
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -309,12 +282,9 @@ namespace MixinSdk
             return Deposit(asset);
         }
 
-        public object ReadAssets()
+        public List<Asset> ReadAssets()
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/assets";
 
@@ -322,7 +292,7 @@ namespace MixinSdk
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -342,10 +312,7 @@ namespace MixinSdk
 
         public VerifyPaymentRsp VerifyPayment(string assetId, string opponentId, string amount, string traceId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/payments";
 
@@ -362,7 +329,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -382,14 +349,11 @@ namespace MixinSdk
 
         public Transfer Transfer(string assetId, string opponentId, string amount, string pin, string traceId, string memo)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/transfers";
 
-            var pinBlock = mixin_utils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
+            var pinBlock = MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters);
 
             var request = new RestRequest(req, Method.POST);
 
@@ -406,7 +370,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -426,10 +390,7 @@ namespace MixinSdk
 
         public Transfer ReadTransfer(string traceId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             string req = "/transfers/trace/" + traceId;
 
@@ -437,7 +398,7 @@ namespace MixinSdk
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -458,11 +419,6 @@ namespace MixinSdk
 
         public List<Asset> TopAssets()
         {
-            if (!isInited)
-            {
-                return null;
-            }
-
             string req = "network/assets/top";
 
             var request = new RestRequest(req, Method.GET);
@@ -484,10 +440,7 @@ namespace MixinSdk
 
         public NetworkAsset NetworkAsset(string assetId)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             string req = "/network/assets/" + assetId;
 
@@ -495,7 +448,7 @@ namespace MixinSdk
 
             request.AddHeader("Content-Type", "application/json");
 
-            string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);
@@ -514,13 +467,8 @@ namespace MixinSdk
 
         }
 
-        public List<Asset> NetworkSnapshots(int limit, string offset, string assetId, string order, bool isAuth)
+        public List<Snapshot> NetworkSnapshots(int limit, string offset, string assetId, string order, bool isAuth)
         {
-            if (!isInited)
-            {
-                isAuth = false;
-            }
-
             string req = "/network/snapshots";
 
             var request = new RestRequest(req, Method.GET);
@@ -539,7 +487,7 @@ namespace MixinSdk
 
             if (isAuth)
             {
-                string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+                string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);
@@ -553,19 +501,15 @@ namespace MixinSdk
                 throw new MixinException(errorinfo);
             }
 
-            var rz = JsonConvert.DeserializeObject<List<Asset>>(response.Data.data);
+            var rz = JsonConvert.DeserializeObject<List<Snapshot>>(response.Data.data);
 
             return rz;
         }
 
-        public Asset NetworkSnapshot(string snapshotId, bool isAuth)
+        public Snapshot NetworkSnapshot(string snapshotId, bool isAuth)
         {
-            if (!isInited)
-            {
-                isAuth = false;
-            }
 
-            string req = "/network/snapshots" + snapshotId;
+            string req = "/network/snapshots/" + snapshotId;
 
             var request = new RestRequest(req, Method.GET);
 
@@ -573,7 +517,7 @@ namespace MixinSdk
 
             if (isAuth)
             {
-                string token = mixin_utils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+                string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);
@@ -587,7 +531,7 @@ namespace MixinSdk
                 throw new MixinException(errorinfo);
             }
 
-            var rz = JsonConvert.DeserializeObject<Asset>(response.Data.data);
+            var rz = JsonConvert.DeserializeObject<Snapshot>(response.Data.data);
 
             return rz;
         }
@@ -668,10 +612,7 @@ namespace MixinSdk
 
         public UserInfo APPUser(string fullName, string sessionSecret)
         {
-            if (!isInited)
-            {
-                return null;
-            }
+            CheckAuth();
 
             const string req = "/users";
 
@@ -686,7 +627,7 @@ namespace MixinSdk
             request.AddHeader("Content-Type", "application/json");
             request.AddJsonBody(p);
 
-            string token = mixin_utils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
 
             var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
             jwtAuth.Authenticate(client, request);

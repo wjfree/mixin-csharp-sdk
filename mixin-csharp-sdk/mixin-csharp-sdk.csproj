@@ -12,5 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Class1.cs" />
+    <Compile Remove="Common.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exception\" />
   </ItemGroup>
 </Project>
