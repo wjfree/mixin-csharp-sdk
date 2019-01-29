@@ -21,6 +21,14 @@ namespace MixinSdk
             }
         }
 
+        /// <summary>
+        /// Init MixinApi use specified ClientId, ClientSecret, SessionId, PinToken and PrivateKey.
+        /// </summary>
+        /// <param name="ClientId">Client identifier.</param>
+        /// <param name="ClientSecret">Client secret.</param>
+        /// <param name="SessionId">Session identifier.</param>
+        /// <param name="PinToken">Pin token.</param>
+        /// <param name="PrivateKey">Private key.</param>
         public void Init(string ClientId, string ClientSecret, string SessionId, string PinToken, string PrivateKey)
         {
             userConfig.ClientId = ClientId;

@@ -5,11 +5,19 @@ using MixinSdk.Bean;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
+using System.Net.WebSockets;
+using System.Threading.Tasks;
+using System.Threading;
+using System.IO.Compression;
 
 namespace MixinSdk
 {
     public class MixinMessagerApi : MixinApi
     {
+        /// <summary>
+        /// Reads the profile.
+        /// </summary>
+        /// <returns>The profile.</returns>
         public UserInfo ReadProfile()
         {
             CheckAuth();
@@ -38,6 +46,12 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Updates the perference.
+        /// </summary>
+        /// <returns>User info.</returns>
+        /// <param name="receiveMessageSource">Receive message source.</param>
+        /// <param name="acceptConversationSource">Accept conversation source.</param>
         public UserInfo UpdatePerference(string receiveMessageSource, string acceptConversationSource)
         {
             CheckAuth();
@@ -74,6 +88,12 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Updates the profile.
+        /// </summary>
+        /// <returns>User info</returns>
+        /// <param name="fullName">Full name.</param>
+        /// <param name="avatarBase64">Avatar base64.</param>
         public UserInfo UpdateProfile(string fullName, string avatarBase64)
         {
             CheckAuth();
@@ -110,6 +130,11 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Reads the users.
+        /// </summary>
+        /// <returns>The users.</returns>
+        /// <param name="userUuids">User uuids.</param>
         public List<UserInfo> ReadUsers(List<String> userUuids)
         {
 
@@ -141,6 +166,11 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Reads the user.
+        /// </summary>
+        /// <returns>The user.</returns>
+        /// <param name="userUuid">User UUID.</param>
         public UserInfo ReadUser(string userUuid)
         {
             CheckAuth();
@@ -170,6 +200,11 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Searchs the user.
+        /// </summary>
+        /// <returns>The user.</returns>
+        /// <param name="mixinIdOrPhoneNo">Mixin identifier or phone no.</param>
         public UserInfo SearchUser(string mixinIdOrPhoneNo)
         {
             CheckAuth();
@@ -199,6 +234,10 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Rotates the user qr.
+        /// </summary>
+        /// <returns>The user qr.</returns>
         public UserInfo RotateUserQR()
         {
             CheckAuth();
@@ -228,6 +267,10 @@ namespace MixinSdk
 
         }
 
+        /// <summary>
+        /// Friends this instance.
+        /// </summary>
+        /// <returns>The friends.</returns>
         public List<UserInfo> Friends()
         {
             CheckAuth();
@@ -256,6 +299,10 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Creates the attachment.
+        /// </summary>
+        /// <returns>The attachment.</returns>
         public Attachment CreateAttachment()
         {
             CheckAuth();
@@ -284,6 +331,12 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Uniques the conversation identifier.
+        /// </summary>
+        /// <returns>The conversation identifier.</returns>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="recipientId">Recipient identifier.</param>
         private string UniqueConversationId(string userId, string recipientId)
         {
             System.Console.WriteLine("a = " + userId);
@@ -315,7 +368,12 @@ namespace MixinSdk
             return s;
         }
 
-
+        /// <summary>
+        /// Creates the conversation.
+        /// </summary>
+        /// <returns>The conversation.</returns>
+        /// <param name="category">Category.</param>
+        /// <param name="participants">Participants.</param>
         public Conversation CreateConversation(string category, List<ParticipantAction> participants)
         {
             CheckAuth();
@@ -364,6 +422,11 @@ namespace MixinSdk
             return rz;
         }
 
+        /// <summary>
+        /// Reads the conversation.
+        /// </summary>
+        /// <returns>The conversation.</returns>
+        /// <param name="conversationId">Conversation identifier.</param>
         public Conversation ReadConversation(string conversationId)
         {
             CheckAuth();
