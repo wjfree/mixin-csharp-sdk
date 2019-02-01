@@ -1,19 +1,29 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
+using MixinSdk.Bean;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
 using RestSharp;
 
 namespace MixinSdk
 {
-    public class MixinApi
+    public partial class MixinApi
     {
-        protected MixinUserConfig userConfig = new MixinUserConfig();
-        protected RSACryptoServiceProvider priKey;
-        protected RsaPrivateCrtKeyParameters rsaParameters;
-        protected bool isInited = false;
-        protected RestClient client = new RestClient(Config.MIXIN_API_URL);
+        public static string MIXIN_API_URL = "https://api.mixin.one";
+        public static string MIXIN_WEBSOCKET_URL = "wss://blaze.mixin.one/";
 
-        protected void CheckAuth()
+
+        private MixinUserConfig userConfig = new MixinUserConfig();
+        private RSACryptoServiceProvider priKey;
+        private RsaPrivateCrtKeyParameters rsaParameters;
+        private bool isInited = false;
+        private RestClient client = new RestClient(MIXIN_API_URL);
+
+        private void CheckAuth()
         {
             if (!isInited)
             {
@@ -37,21 +47,90 @@ namespace MixinSdk
             userConfig.PinToken = PinToken;
             userConfig.PrivateKey = PrivateKey;
 
-            priKey = RSA.RSA_PEM.FromPEM(userConfig.PrivateKey);
+            PemReader pemReader = new PemReader(new StringReader(PrivateKey));
+            AsymmetricCipherKeyPair pk = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+            rsaParameters = (RsaPrivateCrtKeyParameters)pk.Private;
 
-
-            var rsaParams = priKey.ExportParameters(true);
-            var Modulus = MixinUtils.makeBigInt(rsaParams.Modulus);
-            var Exponent = MixinUtils.makeBigInt(rsaParams.Exponent);
-            var D = MixinUtils.makeBigInt(rsaParams.D);
-            var P = MixinUtils.makeBigInt(rsaParams.P);
-            var Q = MixinUtils.makeBigInt(rsaParams.Q);
-            var DP = MixinUtils.makeBigInt(rsaParams.DP);
-            var DQ = MixinUtils.makeBigInt(rsaParams.DQ);
-            var InverseQ = MixinUtils.makeBigInt(rsaParams.InverseQ);
-            rsaParameters = new RsaPrivateCrtKeyParameters(Modulus, Exponent, D, P, Q, DP, DQ, InverseQ);
+            priKey = new RSACryptoServiceProvider();
+            priKey.ImportParameters(DotNetUtilities.ToRSAParameters(rsaParameters));
 
             isInited = true;
+        }
+
+        private UInt64 iterator = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        private UInt64 getIterator()
+        {
+            iterator++;
+            return iterator;
+        }
+
+        private string GenGetJwtToken(string uri, string body)
+        {
+            return MixinUtils.GenJwtAuthCode("GET", uri, body, userConfig.ClientId, userConfig.SessionId, priKey);
+        }
+
+        private string GenPostJwtToken(string uri, string body)
+        {
+            return MixinUtils.GenJwtAuthCode("POST", uri, body, userConfig.ClientId, userConfig.SessionId, priKey);
+        }
+
+        private string GenEncrypedPin(string pin)
+        {
+            return MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters, getIterator());
+        }
+
+        private string doPostRequest(string uri, object o, bool isNeedAuth)
+        {
+            var request = new RestRequest(uri, Method.POST);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(o);
+
+            if (isNeedAuth)
+            {
+                CheckAuth();
+
+                string token = GenPostJwtToken(uri, JsonConvert.SerializeObject(o));
+                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
+                jwtAuth.Authenticate(client, request);
+            }
+
+            var response = client.Execute<Data>(request);
+
+            if (null == response.Data.data )
+            {
+                if (response.Content.Equals("{}")){
+                    return response.Content;
+                }
+                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
+                throw new MixinException(errorinfo);
+            }
+
+            return response.Data.data;
+        }
+
+        private string doGetRequest(string uri, bool isNeedAuth)
+        {
+            var request = new RestRequest(uri, Method.GET);
+            request.AddHeader("Content-Type", "application/json");
+
+            if (isNeedAuth)
+            {
+                CheckAuth();
+
+                string token = GenGetJwtToken(uri, "");
+                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
+                jwtAuth.Authenticate(client, request);
+            }
+
+            var response = client.Execute<Data>(request);
+
+            if (null == response.Data.data)
+            {
+                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
+                throw new MixinException(errorinfo);
+            }
+
+            return response.Data.data;
         }
     }
 }

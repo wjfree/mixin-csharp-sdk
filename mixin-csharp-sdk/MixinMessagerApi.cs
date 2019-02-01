@@ -1,18 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
-using RestSharp;
+using System.Text;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO.Compression;
 
 namespace MixinSdk
 {
-    public class MixinMessagerApi : MixinApi
+    public partial class MixinApi
     {
         /// <summary>
         /// Reads the profile.
@@ -20,30 +15,10 @@ namespace MixinSdk
         /// <returns>The profile.</returns>
         public UserInfo ReadProfile()
         {
-            CheckAuth();
-
             const string req = "/me";
 
-            var request = new RestRequest(req, Method.GET);
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -54,11 +29,7 @@ namespace MixinSdk
         /// <param name="acceptConversationSource">Accept conversation source.</param>
         public UserInfo UpdatePerference(string receiveMessageSource, string acceptConversationSource)
         {
-            CheckAuth();
-
             const string req = "/me/preferences";
-
-            var request = new RestRequest(req, Method.POST);
 
             UserPerference p = new UserPerference
             {
@@ -66,26 +37,9 @@ namespace MixinSdk
                 accept_conversation_source = acceptConversationSource
             };
 
+            var rz = doPostRequest(req, p, true);
 
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(p);
-
-            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -96,38 +50,17 @@ namespace MixinSdk
         /// <param name="avatarBase64">Avatar base64.</param>
         public UserInfo UpdateProfile(string fullName, string avatarBase64)
         {
-            CheckAuth();
-
             const string req = "/me";
-
-            var request = new RestRequest(req, Method.POST);
-
+            
             UserProfile p = new UserProfile
             {
                 full_name = fullName,
                 avatar_base64 = avatarBase64
             };
 
+            var rz = doPostRequest(req, p, true);
 
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(p);
-
-            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -137,33 +70,11 @@ namespace MixinSdk
         /// <param name="userUuids">User uuids.</param>
         public List<UserInfo> ReadUsers(List<String> userUuids)
         {
-
-            CheckAuth();
-
             const string req = "/users/fetch";
 
-            var request = new RestRequest(req, Method.POST);
+            var rz = doPostRequest(req, userUuids, true);
 
-
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(userUuids);
-
-            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(userUuids), userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<List<UserInfo>>(response.Data.data);
-
-            return rz;
+            return JsonConvert.DeserializeObject<List<UserInfo>>(rz);
         }
 
         /// <summary>
@@ -173,31 +84,10 @@ namespace MixinSdk
         /// <param name="userUuid">User UUID.</param>
         public UserInfo ReadUser(string userUuid)
         {
-            CheckAuth();
-
             string req = "/users/" + userUuid;
 
-            var request = new RestRequest(req, Method.GET);
-
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -207,31 +97,10 @@ namespace MixinSdk
         /// <param name="mixinIdOrPhoneNo">Mixin identifier or phone no.</param>
         public UserInfo SearchUser(string mixinIdOrPhoneNo)
         {
-            CheckAuth();
-
             string req = "/search/" + mixinIdOrPhoneNo;
 
-            var request = new RestRequest(req, Method.GET);
-
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -240,31 +109,10 @@ namespace MixinSdk
         /// <returns>The user qr.</returns>
         public UserInfo RotateUserQR()
         {
-            CheckAuth();
-
             const string req = "/me/code";
 
-            var request = new RestRequest(req, Method.GET);
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<UserInfo>(response.Data.data);
-
-            return rz;
-
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
         /// <summary>
@@ -273,30 +121,10 @@ namespace MixinSdk
         /// <returns>The friends.</returns>
         public List<UserInfo> Friends()
         {
-            CheckAuth();
-
             const string req = "/friends";
 
-            var request = new RestRequest(req, Method.GET);
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<List<UserInfo>>(response.Data.data);
-
-            return rz;
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<List<UserInfo>>(rz);
         }
 
         /// <summary>
@@ -305,30 +133,10 @@ namespace MixinSdk
         /// <returns>The attachment.</returns>
         public Attachment CreateAttachment()
         {
-            CheckAuth();
-
             const string req = "/attachments";
 
-            var request = new RestRequest(req, Method.POST);
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("POST", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<Attachment>(response.Data.data);
-
-            return rz;
+            var rz = doPostRequest(req, null, true);
+            return JsonConvert.DeserializeObject<Attachment>(rz);
         }
 
         /// <summary>
@@ -364,7 +172,6 @@ namespace MixinSdk
             s = s.Substring(0, 23) + "-" + s.Substring(23);
             s = s.ToLower();
 
-            System.Console.WriteLine("UUID = " + s);
             return s;
         }
 
@@ -376,8 +183,6 @@ namespace MixinSdk
         /// <param name="participants">Participants.</param>
         public Conversation CreateConversation(string category, List<ParticipantAction> participants)
         {
-            CheckAuth();
-
             if (!"GROUP".Equals(category) && !"CONTACT".Equals(category))
             {
                 return null;
@@ -389,10 +194,7 @@ namespace MixinSdk
                 conversationId = UniqueConversationId(userConfig.ClientId, participants[0].user_id);
             }
 
-
             const string req = "/conversations";
-
-            var request = new RestRequest(req, Method.POST);
             var p = new CreateConversationReq
             {
                 category = category,
@@ -400,26 +202,8 @@ namespace MixinSdk
                 participants = participants
             };
 
-
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(p);
-
-            string token = MixinUtils.GenJwtAuthCode("POST", req, JsonConvert.SerializeObject(p), userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<Conversation>(response.Data.data);
-
-            return rz;
+            var rz = doPostRequest(req, p, true);
+            return JsonConvert.DeserializeObject<Conversation>(rz);
         }
 
         /// <summary>
@@ -429,30 +213,10 @@ namespace MixinSdk
         /// <param name="conversationId">Conversation identifier.</param>
         public Conversation ReadConversation(string conversationId)
         {
-            CheckAuth();
-
             string req = "/conversations/" + conversationId;
 
-            var request = new RestRequest(req, Method.GET);
-
-            request.AddHeader("Content-Type", "application/json");
-
-            string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
-
-            var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-            jwtAuth.Authenticate(client, request);
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            var rz = JsonConvert.DeserializeObject<Conversation>(response.Data.data);
-
-            return rz;
+            var rz = doGetRequest(req, true);
+            return JsonConvert.DeserializeObject<Conversation>(rz);
         }
     }
 }

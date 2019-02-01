@@ -7,7 +7,7 @@ using MixinSdk.Bean;
 
 namespace MixinSdk
 {
-    public class MixinWebSocketApi : MixinApi
+    public partial class MixinApi
     {
         /// <summary>
         /// Webs the socket connect.
@@ -18,12 +18,12 @@ namespace MixinSdk
             ClientWebSocket clientWebSocket = new ClientWebSocket();
             clientWebSocket.Options.AddSubProtocol("Mixin-Blaze-1");
 
-            string token = MixinUtils.GenJwtAuthCode("GET", "/", "", userConfig.ClientId, userConfig.SessionId, priKey);
+            string token = GenGetJwtToken("/", "");
 
             clientWebSocket.Options.SetRequestHeader("Authorization", "Bearer " + token);
             using (var cts = new CancellationTokenSource(10000))
             {
-                Task taskConnect = clientWebSocket.ConnectAsync(new Uri(Config.MIXIN_WEBSOCKET_URL), cts.Token);
+                Task taskConnect = clientWebSocket.ConnectAsync(new Uri(MIXIN_WEBSOCKET_URL), cts.Token);
 
                 await taskConnect;
             }
@@ -34,7 +34,7 @@ namespace MixinSdk
             }
             else
             {
-                System.Console.WriteLine("Connetced fails" + clientWebSocket.State);
+                System.Console.WriteLine("Connetced fails: " + clientWebSocket.State);
             }
 
             return clientWebSocket;

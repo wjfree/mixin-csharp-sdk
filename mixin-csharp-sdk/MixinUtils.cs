@@ -17,12 +17,6 @@ namespace MixinSdk
     {
         private static Random random = new Random();
 
-        private static UInt64 iterator = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-        private static UInt64 getIterator()
-        {
-            iterator++;
-            return iterator;
-        }
 
         private static string BCD2ASC(byte[] bBcd)
         {
@@ -46,7 +40,6 @@ namespace MixinSdk
         {
             byte[] bsha256 = null;
 
-
             using (SHA256 mySHA256 = SHA256.Create())
             {
                 var signData = method + uri + body;
@@ -59,11 +52,11 @@ namespace MixinSdk
                             {"sid", sessionId },
                             {"iat", ToUnixTime(DateTime.UtcNow)},
                             {"exp", ToUnixTime(DateTime.UtcNow) + 3600}, //过期时间暂定一小时
-                            {"jti", System.Guid.NewGuid().ToString()},
+                            {"jti", Guid.NewGuid().ToString()},
                             {"sig", BCD2ASC(bsha256)}
                         };
 
-            string token = Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS512);
+            string token = JWT.Encode(payload, privateKey, JwsAlgorithm.RS512);
 
             return token;
         }
@@ -82,12 +75,11 @@ namespace MixinSdk
             return new BigInteger(bytes);
         }
 
-        public static string GenEncrypedPin(string pin, string pinToken, string sessionId, RsaPrivateCrtKeyParameters rsa)
+        public static string GenEncrypedPin(string pin, string pinToken, string sessionId, RsaPrivateCrtKeyParameters rsa, UInt64 it)
         {
             UInt64 time = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            UInt64 it = getIterator();
 
-            var bPinToken = System.Convert.FromBase64String(pinToken);
+            var bPinToken = Convert.FromBase64String(pinToken);
 
 
             IAsymmetricBlockCipher cipherRsa = new RsaBlindedEngine();
@@ -116,10 +108,10 @@ namespace MixinSdk
 
 
             var blocks = new byte[len];
-            System.Array.Copy(bPin, blocks, bPin.Length);
-            System.Array.Copy(btime, 0, blocks, bPin.Length, btime.Length);
-            System.Array.Copy(biterator, 0, blocks, bPin.Length + btime.Length, biterator.Length);
-            System.Array.Copy(bPadding, 0, blocks, bPin.Length + btime.Length + biterator.Length, nPadding);
+            Array.Copy(bPin, blocks, bPin.Length);
+            Array.Copy(btime, 0, blocks, bPin.Length, btime.Length);
+            Array.Copy(biterator, 0, blocks, bPin.Length + btime.Length, biterator.Length);
+            Array.Copy(bPadding, 0, blocks, bPin.Length + btime.Length + biterator.Length, nPadding);
 
             var iv = new byte[bsize];
             random.NextBytes(iv);
@@ -132,10 +124,10 @@ namespace MixinSdk
             bc.Init(true, parametersWithIV);
             var bOut = bc.ProcessBytes(blocks);
             var rz = new byte[bOut.Length + bsize];
-            System.Array.Copy(iv, rz, iv.Length);
-            System.Array.Copy(bOut, 0, rz, iv.Length, bOut.Length);
+            Array.Copy(iv, rz, iv.Length);
+            Array.Copy(bOut, 0, rz, iv.Length, bOut.Length);
 
-            return System.Convert.ToBase64String(rz);
+            return Convert.ToBase64String(rz);
         }
 
     }

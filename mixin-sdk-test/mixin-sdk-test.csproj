@@ -8,4 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\mixin-csharp-sdk\mixin-csharp-sdk.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.4" />
+  </ItemGroup>
 </Project>
