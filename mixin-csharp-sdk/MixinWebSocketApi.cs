@@ -264,7 +264,7 @@ namespace MixinSdk
         }
 
 
-        public async Task StartRecive(ClientWebSocket clientWebSocket)
+        public async Task StartRecive()
         {
             var buffer = new byte[4096 * 2];
             int startIndex = 0;

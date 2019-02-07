@@ -11,7 +11,9 @@ namespace MixinSdk.Bean
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            var jss = new JsonSerializerSettings();
+            jss.NullValueHandling = NullValueHandling.Ignore;
+            return JsonConvert.SerializeObject(this, jss);
         }
     }
 
@@ -33,7 +35,9 @@ namespace MixinSdk.Bean
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            var jss = new JsonSerializerSettings();
+            jss.NullValueHandling = NullValueHandling.Ignore;
+            return JsonConvert.SerializeObject(this, jss);
         }
     }
 
