@@ -79,7 +79,7 @@ namespace MixinSdk
             return MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters, getIterator());
         }
 
-        private string doPostRequest(string uri, object o, bool isNeedAuth)
+        private string doPostRequest(string uri, object o, bool isNeedAuth, string token = null)
         {
             var request = new RestRequest(uri, Method.POST);
             request.AddHeader("Content-Type", "application/json");
@@ -87,9 +87,11 @@ namespace MixinSdk
 
             if (isNeedAuth)
             {
-                CheckAuth();
-
-                string token = GenPostJwtToken(uri, JsonConvert.SerializeObject(o));
+                if (string.IsNullOrEmpty(token))
+                {
+                    CheckAuth();
+                    token = GenPostJwtToken(uri, JsonConvert.SerializeObject(o));
+                }
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);
             }
@@ -108,16 +110,18 @@ namespace MixinSdk
             return response.Data.data;
         }
 
-        private string doGetRequest(string uri, bool isNeedAuth)
+        private string doGetRequest(string uri, bool isNeedAuth, string token = null)
         {
             var request = new RestRequest(uri, Method.GET);
             request.AddHeader("Content-Type", "application/json");
 
             if (isNeedAuth)
             {
-                CheckAuth();
-
-                string token = GenGetJwtToken(uri, "");
+                if (string.IsNullOrEmpty(token))
+                {
+                    CheckAuth();
+                    token = GenGetJwtToken(uri, "");
+                }
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);
             }

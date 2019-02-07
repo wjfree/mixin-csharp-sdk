@@ -61,11 +61,11 @@ namespace MixinSdk
         /// </summary>
         /// <returns>The deposit.</returns>
         /// <param name="assetID">Asset identifier.</param>
-        public Asset Deposit(string assetID)
+        public Asset Deposit(string assetID, string token = null)
         {
             string req = "/assets/" + assetID;
 
-            var rz = doGetRequest(req, true);
+            var rz = doGetRequest(req, true, token);
 
             return JsonConvert.DeserializeObject<Asset>(rz);
         }
@@ -188,20 +188,20 @@ namespace MixinSdk
         /// </summary>
         /// <returns>The asset.</returns>
         /// <param name="asset">Asset.</param>
-        public object ReadAsset(string asset)
+        public object ReadAsset(string asset, string token = null)
         {
-            return Deposit(asset);
+            return Deposit(asset, token);
         }
 
         /// <summary>
         /// Reads the assets.
         /// </summary>
         /// <returns>The assets.</returns>
-        public List<Asset> ReadAssets()
+        public List<Asset> ReadAssets(string token = null)
         {
             const string req = "/assets";
 
-            var rz = doGetRequest(req, true);
+            var rz = doGetRequest(req, true, token);
 
             return JsonConvert.DeserializeObject<List<Asset>>(rz);
         }

@@ -9,7 +9,6 @@ using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
 
 namespace MixinSdk
 {
@@ -61,23 +60,9 @@ namespace MixinSdk
             return token;
         }
 
-        public static BigInteger makeBigInt(byte[] bytes)
+        public static string GenEncrypedPin(string pin, string pinToken, string sessionId, RsaPrivateCrtKeyParameters rsa, ulong it)
         {
-            if ((sbyte)bytes[0] < 0)
-            {
-                // prepend a zero byte to make it positive.
-                var bytes1 = new byte[bytes.Length + 1];
-                bytes1[0] = 0;
-                bytes.CopyTo(bytes1, 1);
-                bytes = bytes1;
-            }
-
-            return new BigInteger(bytes);
-        }
-
-        public static string GenEncrypedPin(string pin, string pinToken, string sessionId, RsaPrivateCrtKeyParameters rsa, UInt64 it)
-        {
-            UInt64 time = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            ulong time = (ulong)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
             var bPinToken = Convert.FromBase64String(pinToken);
 

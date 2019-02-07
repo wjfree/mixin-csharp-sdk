@@ -48,4 +48,52 @@ namespace MixinSdk.Bean
             return JsonConvert.SerializeObject(this);
         }
     }
+
+    /// <summary>
+    /// Message attachment.
+    /// Can Used for Image, Video, Data message
+    /// </summary>
+    public class MsgAttachment
+    {
+        public string attachment_id { get; set; }
+        public string mime_type { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
+        public long size { get; set; }
+        public long duration { get; set; }
+        public string thumbnail { get; set; }
+        public string name { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    public class AppButton
+    {
+        public string label { get; set; }
+        public string color { get; set; }
+        public string action { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    public class AppCard
+    {
+        public string icon_url { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string action { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+
 }

@@ -9,15 +9,36 @@ namespace MixinSdk
 {
     public partial class MixinApi
     {
+        public string GetOAuthString(string scope)
+        {
+            return "https://mixin.one/oauth/authorize?client_id=" + userConfig.ClientId + "&scope=" + scope + "&response_type=code";
+        }
+
+        public string GetClientAuthToken(string code)
+        {
+            const string req = "/oauth/token";
+
+            var p = new AuthTokenReq {
+                code = code,
+                client_id = userConfig.ClientId,
+                client_secret = userConfig.ClientSecret
+            };
+
+            var rz = doPostRequest(req, p, false);
+            var rsp = JsonConvert.DeserializeObject<AuthTokenRsp>(rz);
+
+            return rsp.access_token;
+        }
+
         /// <summary>
         /// Reads the profile.
         /// </summary>
         /// <returns>The profile.</returns>
-        public UserInfo ReadProfile()
+        public UserInfo ReadProfile(string token = null)
         {
             const string req = "/me";
 
-            var rz = doGetRequest(req, true);
+            var rz = doGetRequest(req, true, token);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
