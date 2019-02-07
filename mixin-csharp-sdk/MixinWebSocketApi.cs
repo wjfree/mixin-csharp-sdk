@@ -11,18 +11,27 @@ namespace MixinSdk
 {
     public partial class MixinApi
     {
-        private ClientWebSocket clientWebSocket;
+        public ClientWebSocket clientWebSocket { get; private set; }
 
+        public delegate void OnOpened(object sender, EventArgs args);
         public delegate void OnRecivedMessage(object sender, EventArgs args, string message);
+        public delegate void OnClosed(object sender, EventArgs args);
+
         public OnRecivedMessage onRecivedMessage;
+        public OnOpened onOpened;
+        public OnClosed onClosed;
+
 
         /// <summary>
         /// Webs the socket connect.
         /// </summary>
         /// <returns>The socket connect.</returns>
-        public async Task WebSocketConnect(OnRecivedMessage onRecivedMessage = null)
+        public async Task WebSocketConnect(OnRecivedMessage onRecivedMessage = null, OnOpened onOpened = null, 
+                                        OnClosed onClosed = null)
         {
             this.onRecivedMessage = onRecivedMessage;
+            this.onOpened = onOpened;
+            this.onClosed = onClosed;
 
             if (null != clientWebSocket)
             {
@@ -44,19 +53,17 @@ namespace MixinSdk
 
             if (clientWebSocket.State == WebSocketState.Open)
             {
-                System.Console.WriteLine("Connetced !!");
+                onOpened?.Invoke(this, null);
             }
             else
             {
-                System.Console.WriteLine("Connetced fails: " + clientWebSocket.State);
+                Console.WriteLine("Connetced fails: " + clientWebSocket.State);
             }
         }
 
         public async Task SendMessage(WebSocketMessage msg)
         {
             string szMsg = msg.ToString();
-
-            Console.WriteLine("发送的报文为："+szMsg); 
 
             var bMsg = Encoding.UTF8.GetBytes(szMsg);
 
@@ -285,6 +292,7 @@ namespace MixinSdk
                 {
                     await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close response received",
                             CancellationToken.None);
+                    onClosed?.Invoke(this, null);
                     return;
                 }
                 if (response.MessageType == WebSocketMessageType.Binary)
@@ -309,6 +317,7 @@ namespace MixinSdk
         public async Task CloseAsync()
         {
             await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "CLose Normally.", CancellationToken.None);
+            onClosed?.Invoke(this, null);
         }
     }
 
