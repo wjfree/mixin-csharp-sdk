@@ -117,7 +117,7 @@ static void HandleOnClosed(object sender, EventArgs args)
 ## 读取其他用户信息
 需要以下步骤来读取用户的个人信息：
 - 搭建一个外网的web service，用于接收客户的回调信息
-- 在APP的配置中心配置上述的回调地址![ https://i.loli.net/2019/02/07/5c5be23b2a5e5.png ]()(https://i.loli.net/2019/02/07/5c5be23b2a5e5.png)
+- 在APP的配置中心配置上述的回调地址![][1]
 - 调用 GetOAuthString 方法获取认证地址，发送给对方，或在你的网页中让用户点击
 - 用户确认后，web service会收到一串code，调用GetClientAuthToken方法可以获取到该用户的token
 - 调用Api时传入token
@@ -128,3 +128,4 @@ Deposit(token);
 ```
 
 
+[1]:	https://i.loli.net/2019/02/07/5c5be23b2a5e5.png "配置图"
