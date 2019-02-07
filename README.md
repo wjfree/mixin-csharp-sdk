@@ -120,8 +120,11 @@ static void HandleOnClosed(object sender, EventArgs args)
 - 在APP的配置中心配置上述的回调地址![UTOOLS1549525562873.png]()(https://i.loli.net/2019/02/07/5c5be23b2a5e5.png)
 - 调用 GetOAuthString 方法获取认证地址，发送给对方，或在你的网页中让用户点击
 - 用户确认后，web service会收到一串code，调用GetClientAuthToken方法可以获取到该用户的token
-- 调用Api时传入token如
+- 调用Api时传入token
+	 
 ```cs
-	ReadProfile(token)
-	```
+ReadProfile(token);
+Deposit(token);
+```
+
 
