@@ -1,6 +1,13 @@
 # Mixin-Csharp-Sdk
 ## 简介
 Mixin-Csharp-Sdk是基于.Net Standard2.0标准开发的跨平台SDK。可使用于.net Framework/dotnet core程序集。
+依赖项：
+- RestSharp 106.6.7
+- jose-jwt 2.4.0
+- Newtonsoft.Json 12.0.1
+- Portable.BouncyCastle 1.8.4
+- SharpZipLib 1.1.0
+- System.Net.WebSockets.WebSocketProtocol 4.5.3
 ## API的使用
 ```cs
 MixinApi mixinApi = new MixinApi();
