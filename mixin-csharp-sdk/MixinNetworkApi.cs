@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
 using RestSharp;
@@ -15,6 +16,11 @@ namespace MixinSdk
         /// <param name="newPin">New pin.</param>
         public UserInfo CreatePIN(string oldPin, string newPin)
         {
+            return CreatePINAsync(oldPin, newPin).Result;
+        }
+
+        public async Task<UserInfo> CreatePINAsync(string oldPin, string newPin)
+        {
             const string req = "/pin/update";
 
             var oldPinBlock = "";
@@ -30,7 +36,7 @@ namespace MixinSdk
                 pin = newPinBlock
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
@@ -42,6 +48,11 @@ namespace MixinSdk
         /// <param name="pin">Pin.</param>
         public UserInfo VerifyPIN(string pin)
         {
+            return VerifyPINAsync(pin).Result;
+        }
+
+        public async Task<UserInfo> VerifyPINAsync(string pin)
+        {
             const string req = "/pin/verify";
 
             var pinBlock = GenEncrypedPin(pin);
@@ -51,7 +62,7 @@ namespace MixinSdk
                 pin = pinBlock
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
@@ -63,9 +74,14 @@ namespace MixinSdk
         /// <param name="assetID">Asset identifier.</param>
         public Asset Deposit(string assetID, string token = null)
         {
+            return DepositAsync(assetID, token).Result;
+        }
+
+        public async Task<Asset> DepositAsync(string assetID, string token = null)
+        {
             string req = "/assets/" + assetID;
 
-            var rz = doGetRequest(req, true, token);
+            var rz = await doGetRequestAsync(req, true, token);
 
             return JsonConvert.DeserializeObject<Asset>(rz);
         }
@@ -81,6 +97,20 @@ namespace MixinSdk
         /// <param name="memo">Memo.</param>
         public WithDrawalInfo Withdrawal(string addressId, string amount, string pin, string traceId, string memo)
         {
+            return WithdrawalAsync(addressId, amount, pin, traceId, memo).Result;
+        }
+
+        /// <summary>
+        /// Withdrawals the async.
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="addressId">Address identifier.</param>
+        /// <param name="amount">Amount.</param>
+        /// <param name="pin">Pin.</param>
+        /// <param name="traceId">Trace identifier.</param>
+        /// <param name="memo">Memo.</param>
+        public async Task<WithDrawalInfo> WithdrawalAsync(string addressId, string amount, string pin, string traceId, string memo)
+        {
             const string req = "/withdrawals";
 
             var pinBlock = GenEncrypedPin(pin);
@@ -94,7 +124,7 @@ namespace MixinSdk
                 memo = memo
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<WithDrawalInfo>(rz);
         }
@@ -111,6 +141,21 @@ namespace MixinSdk
         /// <param name="pin">Pin.</param>
         public Address CreateAddress(string assetId, string publicKey, string label, string accountName, string accountTag, string pin)
         {
+            return CreateAddressAsync(assetId, publicKey, label, accountName, accountTag, pin).Result;
+        }
+
+        /// <summary>
+        /// Creates the address async.
+        /// </summary>
+        /// <returns>The address async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
+        /// <param name="publicKey">Public key.</param>
+        /// <param name="label">Label.</param>
+        /// <param name="accountName">Account name.</param>
+        /// <param name="accountTag">Account tag.</param>
+        /// <param name="pin">Pin.</param>
+        public async Task<Address> CreateAddressAsync(string assetId, string publicKey, string label, string accountName, string accountTag, string pin)
+        {
             const string req = "/addresses";
 
             var pinBlock = GenEncrypedPin(pin);
@@ -125,7 +170,7 @@ namespace MixinSdk
                 pin = pinBlock
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<Address>(rz);
         }
@@ -138,6 +183,11 @@ namespace MixinSdk
         /// <param name="addressId">Address identifier.</param>
         public bool DeleteAddress(string pin, string addressId)
         {
+            return DeleteAddressAsync(pin, addressId).Result;
+        }
+
+        public async Task<bool> DeleteAddressAsync(string pin, string addressId)
+        {
             string req = "/addresses/" + addressId + "/delete";
 
             var pinBlock = GenEncrypedPin(pin);
@@ -145,11 +195,9 @@ namespace MixinSdk
             VerifyPinReq p = new VerifyPinReq
             {
                 pin = pinBlock
-
             };
 
-            var rz = doPostRequest(req, p, true);
-
+            var rz = await doPostRequestAsync(req, p, true);
             return true;
         }
 
@@ -160,12 +208,14 @@ namespace MixinSdk
         /// <param name="addressId">Address identifier.</param>
         public Address ReadAddress(string addressId)
         {
+            return ReadAddressAsync(addressId).Result;
+        }
+
+        public async Task<Address> ReadAddressAsync(string addressId)
+        {
             string req = "/addresses/" + addressId;
-
-            var rz = doGetRequest(req, true);
-
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<Address>(rz);
-
         }
 
         /// <summary>
@@ -175,12 +225,14 @@ namespace MixinSdk
         /// <param name="assetId">Asset identifier.</param>
         public List<Address> WithdrawalAddresses(string assetId)
         {
+            return WithdrawalAddressesAsync(assetId).Result;
+        }
+
+        public async Task<List<Address>> WithdrawalAddressesAsync(string assetId)
+        {
             string req = "/assets/" + assetId + "/addresses";
-
-            var rz = doGetRequest(req, true);
-
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<List<Address>>(rz);
-
         }
 
         /// <summary>
@@ -188,9 +240,14 @@ namespace MixinSdk
         /// </summary>
         /// <returns>The asset.</returns>
         /// <param name="asset">Asset.</param>
-        public object ReadAsset(string asset, string token = null)
+        public Asset ReadAsset(string asset, string token = null)
         {
             return Deposit(asset, token);
+        }
+
+        public async Task<Asset> ReadAssetAsync(string asset, string token = null)
+        {
+            return await DepositAsync(asset, token);
         }
 
         /// <summary>
@@ -199,10 +256,13 @@ namespace MixinSdk
         /// <returns>The assets.</returns>
         public List<Asset> ReadAssets(string token = null)
         {
+            return ReadAssetsAsync(token).Result;
+        }
+
+        public async Task<List<Asset>> ReadAssetsAsync(string token = null)
+        {
             const string req = "/assets";
-
-            var rz = doGetRequest(req, true, token);
-
+            var rz = await doGetRequestAsync(req, true, token);
             return JsonConvert.DeserializeObject<List<Asset>>(rz);
         }
 
@@ -217,6 +277,11 @@ namespace MixinSdk
         /// <param name="traceId">Trace identifier.</param>
         public VerifyPaymentRsp VerifyPayment(string assetId, string opponentId, string amount, string traceId)
         {
+            return VerifyPaymentAsync(assetId, opponentId, amount, traceId).Result;
+        }
+
+        public async Task<VerifyPaymentRsp> VerifyPaymentAsync(string assetId, string opponentId, string amount, string traceId)
+        {
             const string req = "/payments";
 
             VerifyPaymentReq p = new VerifyPaymentReq
@@ -227,7 +292,7 @@ namespace MixinSdk
                 trace_id = traceId
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<VerifyPaymentRsp>(rz);
         }
@@ -245,6 +310,11 @@ namespace MixinSdk
         /// <param name="memo">Memo.</param>
         public Transfer Transfer(string assetId, string opponentId, string amount, string pin, string traceId, string memo)
         {
+            return TransferAsync(assetId, opponentId, amount, pin, traceId, memo).Result;
+        }
+
+        public async Task<Transfer> TransferAsync(string assetId, string opponentId, string amount, string pin, string traceId, string memo)
+        {
             const string req = "/transfers";
 
             var pinBlock = GenEncrypedPin(pin);
@@ -259,7 +329,7 @@ namespace MixinSdk
                 memo = memo
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<Transfer>(rz);
         }

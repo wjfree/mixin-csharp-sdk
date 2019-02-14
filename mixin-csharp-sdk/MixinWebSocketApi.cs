@@ -44,7 +44,7 @@ namespace MixinSdk
             string token = GenGetJwtToken("/", "");
 
             clientWebSocket.Options.SetRequestHeader("Authorization", "Bearer " + token);
-            using (var cts = new CancellationTokenSource(10000))
+            using (var cts = new CancellationTokenSource(ReadTimeout))
             {
                 Task taskConnect = clientWebSocket.ConnectAsync(new Uri(MIXIN_WEBSOCKET_URL), cts.Token);
 
@@ -69,7 +69,7 @@ namespace MixinSdk
 
             var compressedMsg = GZipHelper.Compress(bMsg);
 
-            using (var cts = new CancellationTokenSource(10000))
+            using (var cts = new CancellationTokenSource(ReadTimeout))
             {
                 await clientWebSocket.SendAsync(new ArraySegment<byte>(compressedMsg), WebSocketMessageType.Binary, true, cts.Token);
             }

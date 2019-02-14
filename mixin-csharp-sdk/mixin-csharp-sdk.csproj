@@ -8,13 +8,16 @@
     <Authors>Ju.Wang</Authors>
     <Owners>mixin</Owners>
     <PackageProjectUrl>https://github.com/wjfree/mixin-csharp-sdk</PackageProjectUrl>
-    <Description>Mixin C# SDK
-Include Mixin network api, messager api and websocket api</Description>
+    <Description>Mixin C# SDK is a high performance sdk for mixin.
+Include Mixin network api, messager api and websocket api.</Description>
     <ReleaseVersion>0.1.0</ReleaseVersion>
     <SynchReleaseVersion>false</SynchReleaseVersion>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="jose-jwt" Version="2.4.0" />
     <PackageReference Include="RestSharp" Version="106.6.7" />
@@ -32,4 +35,13 @@ Include Mixin network api, messager api and websocket api</Description>
   <ItemGroup>
     <Folder Include="Exception\" />
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <StandardHeader Text="" IncludeInNewFiles="True" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

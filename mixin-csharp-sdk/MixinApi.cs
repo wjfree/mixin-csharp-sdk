@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Crypto;
@@ -13,9 +15,9 @@ namespace MixinSdk
 {
     public partial class MixinApi
     {
-        public static string MIXIN_API_URL = "https://api.mixin.one";
-        public static string MIXIN_WEBSOCKET_URL = "wss://blaze.mixin.one/";
-
+        public const string MIXIN_API_URL = "https://api.mixin.one";
+        public const string MIXIN_WEBSOCKET_URL = "wss://blaze.mixin.one/";
+        public int ReadTimeout { get; set; } = 10000;
 
         private MixinUserConfig userConfig = new MixinUserConfig();
         private RSACryptoServiceProvider priKey;
@@ -79,6 +81,39 @@ namespace MixinSdk
             return MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters, getIterator());
         }
 
+        private async Task<string> doPostRequestAsync(string uri, object o, bool isNeedAuth, string token = null)
+        {
+            var request = new RestRequest(uri, Method.POST);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(o);
+
+            if (isNeedAuth)
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    CheckAuth();
+                    token = GenPostJwtToken(uri, JsonConvert.SerializeObject(o));
+                }
+                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
+                jwtAuth.Authenticate(client, request);
+            }
+
+            var cts = new CancellationTokenSource(ReadTimeout);
+            var response = await client.ExecuteTaskAsync<Data>(request, cts.Token);
+
+            if (null == response.Data.data)
+            {
+                if (response.Content.Equals("{}"))
+                {
+                    return response.Content;
+                }
+                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
+                throw new MixinException(errorinfo);
+            }
+
+            return response.Data.data;
+        }
+
         private string doPostRequest(string uri, object o, bool isNeedAuth, string token = null)
         {
             var request = new RestRequest(uri, Method.POST);
@@ -103,6 +138,34 @@ namespace MixinSdk
                 if (response.Content.Equals("{}")){
                     return response.Content;
                 }
+                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
+                throw new MixinException(errorinfo);
+            }
+
+            return response.Data.data;
+        }
+
+        private async Task<string> doGetRequestAsync(string uri, bool isNeedAuth, string token = null)
+        {
+            var request = new RestRequest(uri, Method.GET);
+            request.AddHeader("Content-Type", "application/json");
+
+            if (isNeedAuth)
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    CheckAuth();
+                    token = GenGetJwtToken(uri, "");
+                }
+                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
+                jwtAuth.Authenticate(client, request);
+            }
+
+            var cts = new CancellationTokenSource(ReadTimeout);
+            var response = await client.ExecuteTaskAsync<Data>(request, cts.Token);
+
+            if (null == response.Data.data)
+            {
                 var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
                 throw new MixinException(errorinfo);
             }
