@@ -114,37 +114,6 @@ namespace MixinSdk
             return response.Data.data;
         }
 
-        private string doPostRequest(string uri, object o, bool isNeedAuth, string token = null)
-        {
-            var request = new RestRequest(uri, Method.POST);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(o);
-
-            if (isNeedAuth)
-            {
-                if (string.IsNullOrEmpty(token))
-                {
-                    CheckAuth();
-                    token = GenPostJwtToken(uri, JsonConvert.SerializeObject(o));
-                }
-                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-                jwtAuth.Authenticate(client, request);
-            }
-
-            var response = client.Execute<Data>(request);
-
-            if (null == response.Data.data )
-            {
-                if (response.Content.Equals("{}")){
-                    return response.Content;
-                }
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            return response.Data.data;
-        }
-
         private async Task<string> doGetRequestAsync(string uri, bool isNeedAuth, string token = null)
         {
             var request = new RestRequest(uri, Method.GET);
@@ -163,33 +132,6 @@ namespace MixinSdk
 
             var cts = new CancellationTokenSource(ReadTimeout);
             var response = await client.ExecuteTaskAsync<Data>(request, cts.Token);
-
-            if (null == response.Data.data)
-            {
-                var errorinfo = JsonConvert.DeserializeObject<MixinError>(response.Content);
-                throw new MixinException(errorinfo);
-            }
-
-            return response.Data.data;
-        }
-
-        private string doGetRequest(string uri, bool isNeedAuth, string token = null)
-        {
-            var request = new RestRequest(uri, Method.GET);
-            request.AddHeader("Content-Type", "application/json");
-
-            if (isNeedAuth)
-            {
-                if (string.IsNullOrEmpty(token))
-                {
-                    CheckAuth();
-                    token = GenGetJwtToken(uri, "");
-                }
-                var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
-                jwtAuth.Authenticate(client, request);
-            }
-
-            var response = client.Execute<Data>(request);
 
             if (null == response.Data.data)
             {

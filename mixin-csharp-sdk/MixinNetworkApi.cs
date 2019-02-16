@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
@@ -19,6 +20,12 @@ namespace MixinSdk
             return CreatePINAsync(oldPin, newPin).Result;
         }
 
+        /// <summary>
+        /// Creates the PIN Async.
+        /// </summary>
+        /// <returns>The PINA sync.</returns>
+        /// <param name="oldPin">Old pin.</param>
+        /// <param name="newPin">New pin.</param>
         public async Task<UserInfo> CreatePINAsync(string oldPin, string newPin)
         {
             const string req = "/pin/update";
@@ -51,6 +58,11 @@ namespace MixinSdk
             return VerifyPINAsync(pin).Result;
         }
 
+        /// <summary>
+        /// Verifies the PIN Async.
+        /// </summary>
+        /// <returns>The PINA sync.</returns>
+        /// <param name="pin">Pin.</param>
         public async Task<UserInfo> VerifyPINAsync(string pin)
         {
             const string req = "/pin/verify";
@@ -77,6 +89,12 @@ namespace MixinSdk
             return DepositAsync(assetID, token).Result;
         }
 
+        /// <summary>
+        /// Deposits the async.
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="assetID">Asset identifier.</param>
+        /// <param name="token">Token.</param>
         public async Task<Asset> DepositAsync(string assetID, string token = null)
         {
             string req = "/assets/" + assetID;
@@ -186,6 +204,12 @@ namespace MixinSdk
             return DeleteAddressAsync(pin, addressId).Result;
         }
 
+        /// <summary>
+        /// Deletes the address async.
+        /// </summary>
+        /// <returns>The address async.</returns>
+        /// <param name="pin">Pin.</param>
+        /// <param name="addressId">Address identifier.</param>
         public async Task<bool> DeleteAddressAsync(string pin, string addressId)
         {
             string req = "/addresses/" + addressId + "/delete";
@@ -211,6 +235,11 @@ namespace MixinSdk
             return ReadAddressAsync(addressId).Result;
         }
 
+        /// <summary>
+        /// Reads the address async.
+        /// </summary>
+        /// <returns>The address async.</returns>
+        /// <param name="addressId">Address identifier.</param>
         public async Task<Address> ReadAddressAsync(string addressId)
         {
             string req = "/addresses/" + addressId;
@@ -228,6 +257,11 @@ namespace MixinSdk
             return WithdrawalAddressesAsync(assetId).Result;
         }
 
+        /// <summary>
+        /// Withdrawals the addresses async.
+        /// </summary>
+        /// <returns>The addresses async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
         public async Task<List<Address>> WithdrawalAddressesAsync(string assetId)
         {
             string req = "/assets/" + assetId + "/addresses";
@@ -245,6 +279,12 @@ namespace MixinSdk
             return Deposit(asset, token);
         }
 
+        /// <summary>
+        /// Reads the asset async.
+        /// </summary>
+        /// <returns>The asset async.</returns>
+        /// <param name="asset">Asset.</param>
+        /// <param name="token">Token.</param>
         public async Task<Asset> ReadAssetAsync(string asset, string token = null)
         {
             return await DepositAsync(asset, token);
@@ -259,6 +299,11 @@ namespace MixinSdk
             return ReadAssetsAsync(token).Result;
         }
 
+        /// <summary>
+        /// Reads the assets async.
+        /// </summary>
+        /// <returns>The assets async.</returns>
+        /// <param name="token">Token.</param>
         public async Task<List<Asset>> ReadAssetsAsync(string token = null)
         {
             const string req = "/assets";
@@ -280,6 +325,14 @@ namespace MixinSdk
             return VerifyPaymentAsync(assetId, opponentId, amount, traceId).Result;
         }
 
+        /// <summary>
+        /// Verifies the payment async.
+        /// </summary>
+        /// <returns>The payment async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
+        /// <param name="opponentId">Opponent identifier.</param>
+        /// <param name="amount">Amount.</param>
+        /// <param name="traceId">Trace identifier.</param>
         public async Task<VerifyPaymentRsp> VerifyPaymentAsync(string assetId, string opponentId, string amount, string traceId)
         {
             const string req = "/payments";
@@ -313,6 +366,16 @@ namespace MixinSdk
             return TransferAsync(assetId, opponentId, amount, pin, traceId, memo).Result;
         }
 
+        /// <summary>
+        /// Transfers the async.
+        /// </summary>
+        /// <returns>The async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
+        /// <param name="opponentId">Opponent identifier.</param>
+        /// <param name="amount">Amount.</param>
+        /// <param name="pin">Pin.</param>
+        /// <param name="traceId">Trace identifier.</param>
+        /// <param name="memo">Memo.</param>
         public async Task<Transfer> TransferAsync(string assetId, string opponentId, string amount, string pin, string traceId, string memo)
         {
             const string req = "/transfers";
@@ -341,9 +404,19 @@ namespace MixinSdk
         /// <param name="traceId">Trace identifier.</param>
         public Transfer ReadTransfer(string traceId)
         {
+            return ReadTransferAsync(traceId).Result;
+        }
+
+        /// <summary>
+        /// Reads the transfer async.
+        /// </summary>
+        /// <returns>The transfer async.</returns>
+        /// <param name="traceId">Trace identifier.</param>
+        public async Task<Transfer> ReadTransferAsync(string traceId)
+        {
             string req = "/transfers/trace/" + traceId;
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
 
             return JsonConvert.DeserializeObject<Transfer>(rz);
         }
@@ -354,31 +427,49 @@ namespace MixinSdk
         /// <returns>The assets.</returns>
         public List<Asset> TopAssets()
         {
+            return TopAssetsAsync().Result;
+        }
+
+        /// <summary>
+        /// Tops the assets async.
+        /// </summary>
+        /// <returns>The assets async.</returns>
+        public async Task<List<Asset>> TopAssetsAsync()
+        {
             string req = "network/assets/top";
 
-            var rz = doGetRequest(req, false);
+            var rz = await doGetRequestAsync(req, false);
 
             return JsonConvert.DeserializeObject<List<Asset>>(rz);
         }
 
 
         /// <summary>
-        /// Networks the asset.
+        /// Network asset.
         /// </summary>
         /// <returns>The asset.</returns>
         /// <param name="assetId">Asset identifier.</param>
         public NetworkAsset NetworkAsset(string assetId)
         {
-            string req = "/network/assets/" + assetId;
-
-            var rz = doGetRequest(req, true);
-
-            return JsonConvert.DeserializeObject<NetworkAsset>(rz);
-
+            return NetworkAssetAsync(assetId).Result;
         }
 
         /// <summary>
-        /// Networks the snapshots.
+        /// Networks asset async.
+        /// </summary>
+        /// <returns>The asset async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
+        public async Task<NetworkAsset> NetworkAssetAsync(string assetId)
+        {
+            string req = "/network/assets/" + assetId;
+
+            var rz = await doGetRequestAsync(req, true);
+
+            return JsonConvert.DeserializeObject<NetworkAsset>(rz);
+        }
+
+        /// <summary>
+        /// Network snapshots.
         /// </summary>
         /// <returns>The snapshots.</returns>
         /// <param name="limit">Limit.</param>
@@ -387,6 +478,20 @@ namespace MixinSdk
         /// <param name="order">Order.</param>
         /// <param name="isAuth">If set to <c>true</c> is auth.</param>
         public List<Snapshot> NetworkSnapshots(int limit, string offset, string assetId, string order, bool isAuth)
+        {
+            return NetworkSnapshotsAsync(limit, offset, assetId, order, isAuth).Result;
+        }
+
+        /// <summary>
+        /// Network snapshots async.
+        /// </summary>
+        /// <returns>The snapshots async.</returns>
+        /// <param name="limit">Limit.</param>
+        /// <param name="offset">Offset.</param>
+        /// <param name="assetId">Asset identifier.</param>
+        /// <param name="order">Order.</param>
+        /// <param name="isAuth">If set to <c>true</c> is auth.</param>
+        public async Task<List<Snapshot>> NetworkSnapshotsAsync(int limit, string offset, string assetId, string order, bool isAuth)
         {
             string req = "/network/snapshots";
 
@@ -412,7 +517,8 @@ namespace MixinSdk
                 jwtAuth.Authenticate(client, request);
             }
 
-            var response = client.Execute<Data>(request);
+            var cts = new CancellationTokenSource(ReadTimeout);
+            var response = await client.ExecuteTaskAsync<Data>(request, cts.Token);
 
             if (null == response.Data.data)
             {
@@ -426,21 +532,32 @@ namespace MixinSdk
         }
 
         /// <summary>
-        /// Networks the snapshot.
+        /// Network snapshot.
         /// </summary>
         /// <returns>The snapshot.</returns>
         /// <param name="snapshotId">Snapshot identifier.</param>
         /// <param name="isAuth">If set to <c>true</c> is auth.</param>
         public Snapshot NetworkSnapshot(string snapshotId, bool isAuth)
         {
+            return NetworkSnapshotAsync(snapshotId, isAuth).Result;
+        }
+
+        /// <summary>
+        /// Network snapshot async.
+        /// </summary>
+        /// <returns>The snapshot async.</returns>
+        /// <param name="snapshotId">Snapshot identifier.</param>
+        /// <param name="isAuth">If set to <c>true</c> is auth.</param>
+        public async Task<Snapshot> NetworkSnapshotAsync(string snapshotId, bool isAuth)
+        {
             string req = "/network/snapshots/" + snapshotId;
 
-            var rz = doGetRequest(req, isAuth);
+            var rz = await doGetRequestAsync(req, isAuth);
             return JsonConvert.DeserializeObject<Snapshot>(rz);
         }
 
         /// <summary>
-        /// Externals the transactions.
+        /// External transactions.
         /// </summary>
         /// <returns>The transactions.</returns>
         /// <param name="assetId">Asset identifier.</param>
@@ -450,6 +567,21 @@ namespace MixinSdk
         /// <param name="limit">Limit.</param>
         /// <param name="offset">Offset.</param>
         public List<ExternalTransation> ExternalTransactions(string assetId, string publicKey, string accountTag, string accountName, int? limit, string offset)
+        {
+            return ExternalTransactionsAsync(assetId, publicKey, accountTag, accountName, limit, offset).Result;
+        }
+
+        /// <summary>
+        /// External transactions async.
+        /// </summary>
+        /// <returns>The transactions async.</returns>
+        /// <param name="assetId">Asset identifier.</param>
+        /// <param name="publicKey">Public key.</param>
+        /// <param name="accountTag">Account tag.</param>
+        /// <param name="accountName">Account name.</param>
+        /// <param name="limit">Limit.</param>
+        /// <param name="offset">Offset.</param>
+        public async Task<List<ExternalTransation>> ExternalTransactionsAsync(string assetId, string publicKey, string accountTag, string accountName, int? limit, string offset)
         {
 
             string req = "/external/transactions";
@@ -488,7 +620,8 @@ namespace MixinSdk
                 request.AddParameter("offset", offset, ParameterType.QueryString);
             }
 
-            var response = client.Execute<Data>(request);
+            var cts = new CancellationTokenSource(ReadTimeout);
+            var response = await client.ExecuteTaskAsync<Data>(request, cts.Token);
 
             if (null == response.Data.data)
             {
@@ -508,13 +641,22 @@ namespace MixinSdk
         /// <param name="assetName">Asset name.</param>
         public List<Asset> SearchAssets(string assetName)
         {
+            return SearchAssetsAsync(assetName).Result;
+        }
+
+        /// <summary>
+        /// Searchs the assets async.
+        /// </summary>
+        /// <returns>The assets async.</returns>
+        /// <param name="assetName">Asset name.</param>
+        public async Task<List<Asset>> SearchAssetsAsync(string assetName)
+        {
             string req = "/network/assets/search/" + assetName;
 
-            var rz = doGetRequest(req, false);
+            var rz = await doGetRequestAsync(req, false);
 
             return JsonConvert.DeserializeObject<List<Asset>>(rz);
         }
-
 
         /// <summary>
         /// Add a app user.
@@ -524,6 +666,11 @@ namespace MixinSdk
         /// <param name="sessionSecret">Session secret.</param>
         public UserInfo APPUser(string fullName, string sessionSecret)
         {
+            return APPUserAsync(fullName, sessionSecret).Result;
+        }
+
+        public async Task<UserInfo> APPUserAsync(string fullName, string sessionSecret)
+        {
             const string req = "/users";
 
             NewUser p = new NewUser
@@ -532,7 +679,7 @@ namespace MixinSdk
                 session_secret = sessionSecret
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
     }

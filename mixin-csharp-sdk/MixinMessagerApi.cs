@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
 
@@ -9,22 +10,44 @@ namespace MixinSdk
 {
     public partial class MixinApi
     {
+
+        /// <summary>
+        /// Gets the OAuth Url.
+        /// </summary>
+        /// <returns>The OAuth Url.</returns>
+        /// <param name="scope">Scope.</param>
         public string GetOAuthString(string scope)
         {
             return "https://mixin.one/oauth/authorize?client_id=" + userConfig.ClientId + "&scope=" + scope + "&response_type=code";
         }
 
+        /// <summary>
+        /// Gets the client auth token.
+        /// </summary>
+        /// <returns>The client auth token.</returns>
+        /// <param name="code">Code.</param>
         public string GetClientAuthToken(string code)
+        {
+            return GetClientAuthTokenAsync(code).Result;
+        }
+
+        /// <summary>
+        /// Gets the client auth token async.
+        /// </summary>
+        /// <returns>The client auth token async.</returns>
+        /// <param name="code">Code.</param>
+        public async Task<string> GetClientAuthTokenAsync(string code)
         {
             const string req = "/oauth/token";
 
-            var p = new AuthTokenReq {
+            var p = new AuthTokenReq
+            {
                 code = code,
                 client_id = userConfig.ClientId,
                 client_secret = userConfig.ClientSecret
             };
 
-            var rz = doPostRequest(req, p, false);
+            var rz = await doPostRequestAsync(req, p, false);
             var rsp = JsonConvert.DeserializeObject<AuthTokenRsp>(rz);
 
             return rsp.access_token;
@@ -36,9 +59,18 @@ namespace MixinSdk
         /// <returns>The profile.</returns>
         public UserInfo ReadProfile(string token = null)
         {
-            const string req = "/me";
+            return ReadProfileAsync(token).Result;
+        }
 
-            var rz = doGetRequest(req, true, token);
+        /// <summary>
+        /// Reads the profile async.
+        /// </summary>
+        /// <returns>The profile async.</returns>
+        /// <param name="token">Token.</param>
+        public async Task<UserInfo> ReadProfileAsync(string token = null)
+        {
+            const string req = "/me";
+            var rz = await doGetRequestAsync(req, true, token);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
@@ -50,6 +82,17 @@ namespace MixinSdk
         /// <param name="acceptConversationSource">Accept conversation source.</param>
         public UserInfo UpdatePerference(string receiveMessageSource, string acceptConversationSource)
         {
+            return UpdatePerferenceAsync(receiveMessageSource, acceptConversationSource).Result;
+        }
+
+        /// <summary>
+        /// Updates the perference async.
+        /// </summary>
+        /// <returns>The perference async.</returns>
+        /// <param name="receiveMessageSource">Receive message source.</param>
+        /// <param name="acceptConversationSource">Accept conversation source.</param>
+        public async Task<UserInfo> UpdatePerferenceAsync(string receiveMessageSource, string acceptConversationSource)
+        {
             const string req = "/me/preferences";
 
             UserPerference p = new UserPerference
@@ -58,7 +101,7 @@ namespace MixinSdk
                 accept_conversation_source = acceptConversationSource
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
@@ -71,15 +114,26 @@ namespace MixinSdk
         /// <param name="avatarBase64">Avatar base64.</param>
         public UserInfo UpdateProfile(string fullName, string avatarBase64)
         {
+            return UpdateProfileAsync(fullName, avatarBase64).Result;
+        }
+
+        /// <summary>
+        /// Updates the profile async.
+        /// </summary>
+        /// <returns>The profile async.</returns>
+        /// <param name="fullName">Full name.</param>
+        /// <param name="avatarBase64">Avatar base64.</param>
+        public async Task<UserInfo> UpdateProfileAsync(string fullName, string avatarBase64)
+        {
             const string req = "/me";
-            
+
             UserProfile p = new UserProfile
             {
                 full_name = fullName,
                 avatar_base64 = avatarBase64
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
 
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
@@ -91,9 +145,19 @@ namespace MixinSdk
         /// <param name="userUuids">User uuids.</param>
         public List<UserInfo> ReadUsers(List<String> userUuids)
         {
+            return ReadUsersAsync(userUuids).Result;
+        }
+
+        /// <summary>
+        /// Reads the users async.
+        /// </summary>
+        /// <returns>The users async.</returns>
+        /// <param name="userUuids">User uuids.</param>
+        public async Task<List<UserInfo>> ReadUsersAsync(List<String> userUuids)
+        {
             const string req = "/users/fetch";
 
-            var rz = doPostRequest(req, userUuids, true);
+            var rz = await doPostRequestAsync(req, userUuids, true);
 
             return JsonConvert.DeserializeObject<List<UserInfo>>(rz);
         }
@@ -105,9 +169,19 @@ namespace MixinSdk
         /// <param name="userUuid">User UUID.</param>
         public UserInfo ReadUser(string userUuid)
         {
+            return ReadUserAsync(userUuid).Result;
+        }
+
+        /// <summary>
+        /// Reads the user async.
+        /// </summary>
+        /// <returns>The user async.</returns>
+        /// <param name="userUuid">User UUID.</param>
+        public async Task<UserInfo> ReadUserAsync(string userUuid)
+        {
             string req = "/users/" + userUuid;
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
@@ -118,9 +192,19 @@ namespace MixinSdk
         /// <param name="mixinIdOrPhoneNo">Mixin identifier or phone no.</param>
         public UserInfo SearchUser(string mixinIdOrPhoneNo)
         {
+            return SearchUserAsync(mixinIdOrPhoneNo).Result;
+        }
+
+        /// <summary>
+        /// Searchs the user async.
+        /// </summary>
+        /// <returns>The user async.</returns>
+        /// <param name="mixinIdOrPhoneNo">Mixin identifier or phone no.</param>
+        public async Task<UserInfo> SearchUserAsync(string mixinIdOrPhoneNo)
+        {
             string req = "/search/" + mixinIdOrPhoneNo;
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
@@ -130,9 +214,18 @@ namespace MixinSdk
         /// <returns>The user qr.</returns>
         public UserInfo RotateUserQR()
         {
+            return RotateUserQRAsync().Result;
+        }
+
+        /// <summary>
+        /// Rotates the user QRA sync.
+        /// </summary>
+        /// <returns>The user QRA sync.</returns>
+        public async Task<UserInfo> RotateUserQRAsync()
+        {
             const string req = "/me/code";
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<UserInfo>(rz);
         }
 
@@ -142,9 +235,18 @@ namespace MixinSdk
         /// <returns>The friends.</returns>
         public List<UserInfo> Friends()
         {
+            return FriendsAsync().Result;
+        }
+
+        /// <summary>
+        /// Friendses the async.
+        /// </summary>
+        /// <returns>The async.</returns>
+        public async Task<List<UserInfo>> FriendsAsync()
+        {
             const string req = "/friends";
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<List<UserInfo>>(rz);
         }
 
@@ -154,9 +256,18 @@ namespace MixinSdk
         /// <returns>The attachment.</returns>
         public Attachment CreateAttachment()
         {
+            return CreateAttachmentAsync().Result;
+        }
+
+        /// <summary>
+        /// Creates the attachment async.
+        /// </summary>
+        /// <returns>The attachment async.</returns>
+        public async Task<Attachment> CreateAttachmentAsync()
+        {
             const string req = "/attachments";
 
-            var rz = doPostRequest(req, null, true);
+            var rz = await doPostRequestAsync(req, null, true);
             return JsonConvert.DeserializeObject<Attachment>(rz);
         }
 
@@ -204,6 +315,17 @@ namespace MixinSdk
         /// <param name="participants">Participants.</param>
         public Conversation CreateConversation(string category, List<ParticipantAction> participants)
         {
+            return CreateConversationAsync(category, participants).Result;
+        }
+
+        /// <summary>
+        /// Creates the conversation async.
+        /// </summary>
+        /// <returns>The conversation async.</returns>
+        /// <param name="category">Category.</param>
+        /// <param name="participants">Participants.</param>
+        public async Task<Conversation> CreateConversationAsync(string category, List<ParticipantAction> participants)
+        {
             if (!"GROUP".Equals(category) && !"CONTACT".Equals(category))
             {
                 return null;
@@ -223,7 +345,7 @@ namespace MixinSdk
                 participants = participants
             };
 
-            var rz = doPostRequest(req, p, true);
+            var rz = await doPostRequestAsync(req, p, true);
             return JsonConvert.DeserializeObject<Conversation>(rz);
         }
 
@@ -234,9 +356,14 @@ namespace MixinSdk
         /// <param name="conversationId">Conversation identifier.</param>
         public Conversation ReadConversation(string conversationId)
         {
+            return ReadConversationAsync(conversationId).Result;
+        }
+
+        public async Task<Conversation> ReadConversationAsync(string conversationId)
+        {
             string req = "/conversations/" + conversationId;
 
-            var rz = doGetRequest(req, true);
+            var rz = await doGetRequestAsync(req, true);
             return JsonConvert.DeserializeObject<Conversation>(rz);
         }
     }
