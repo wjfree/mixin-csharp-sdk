@@ -1,4 +1,6 @@
-# Mixin-Csharp-Sdk
+# Mixin Csharp Sdk
+[![Build status](https://ci.appveyor.com/api/projects/status/70obdywndwo5pvc6?svg=true)](https://ci.appveyor.com/project/wjfree/mixin-csharp-sdk)
+
 ## 简介
 Mixin-Csharp-Sdk是基于.Net Standard2.0标准开发的跨平台高性能的SDK，实现了https://developers.mixin.one/api 上的全部接口。具备同步与异步接口，可使用于.net Framework/dotnet core程序集。在nuget上搜索MixinCSharpSdk可以找到该SDK，可直接引用到项目中。
 依赖项：
