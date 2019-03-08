@@ -271,6 +271,19 @@ namespace MixinSdk
         }
 
 
+        public async Task SendMessageResponse(string msgid)
+        {
+            await SendMessage(new WebSocketMessage
+            {
+                id = Guid.NewGuid().ToString(),
+                action = "ACKNOWLEDGE_MESSAGE_RECEIPT",
+                @params = new Params
+                {
+                    message_id = msgid,
+                    status = "READ",
+                }
+            });
+        }
         public async Task StartRecive()
         {
             var buffer = new byte[4096 * 2];
