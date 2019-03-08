@@ -76,17 +76,17 @@ namespace MixinSdk
         }
 
 
-        public async Task SendTextMessage(string conversationId, string text)
+        public async Task SendTextMessage(string conversationId, string text, string message_id, string websocketmsg_id)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = websocketmsg_id,
                 action = "CREATE_MESSAGE",
                 @params = new Params {
                     conversation_id = conversationId,
                     category = "PLAIN_TEXT",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = message_id,
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text))
                 }
             };
@@ -271,11 +271,11 @@ namespace MixinSdk
         }
 
 
-        public async Task SendMessageResponse(string msgid)
+        public async Task SendMessageResponse(string msgid, string websocketmsg_id)
         {
             await SendMessage(new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = websocketmsg_id,
                 action = "ACKNOWLEDGE_MESSAGE_RECEIPT",
                 @params = new Params
                 {
