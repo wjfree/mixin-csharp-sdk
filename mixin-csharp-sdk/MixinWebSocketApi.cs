@@ -76,7 +76,7 @@ namespace MixinSdk
         }
 
 
-        public async Task SendTextMessage(string conversationId, string text)
+        public async Task SendTextMessage(string conversationId, string text, string message_id)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
@@ -86,7 +86,7 @@ namespace MixinSdk
                     conversation_id = conversationId,
                     category = "PLAIN_TEXT",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = message_id,
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text))
                 }
             };
