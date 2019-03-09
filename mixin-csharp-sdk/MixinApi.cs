@@ -17,6 +17,11 @@ namespace MixinSdk
     {
         public const string MIXIN_API_URL = "https://api.mixin.one";
         public const string MIXIN_WEBSOCKET_URL = "wss://blaze.mixin.one/";
+
+        /// <summary>
+        /// Gets or sets the read timeout.
+        /// </summary>
+        /// <value>Read timeout</value>
         public int ReadTimeout { get; set; } = 10000;
 
         private MixinUserConfig userConfig = new MixinUserConfig();

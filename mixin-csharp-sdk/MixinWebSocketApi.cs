@@ -76,11 +76,11 @@ namespace MixinSdk
         }
 
 
-        public async Task SendTextMessage(string conversationId, string text)
+        public async Task SendTextMessage(string conversationId, string text, string messageId = null)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params {
                     conversation_id = conversationId,
@@ -94,11 +94,11 @@ namespace MixinSdk
             await SendMessage(msg);
         }
 
-        public async Task SendStickerMessage(string conversationId, string name, string albumId)
+        public async Task SendStickerMessage(string conversationId, string name, string albumId, string messageId = null)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -113,11 +113,11 @@ namespace MixinSdk
             await SendMessage(msg);
         }
 
-        public async Task SendContactMessage(string conversationId, string userId)
+        public async Task SendContactMessage(string conversationId, string userId, string messageId = null)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -132,11 +132,11 @@ namespace MixinSdk
             await SendMessage(msg);
         }
 
-        public async Task SendAppButtonGroupMessage(string conversationId, List<AppButton> appButtons )
+        public async Task SendAppButtonGroupMessage(string conversationId, List<AppButton> appButtons, string messageId = null)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -151,11 +151,11 @@ namespace MixinSdk
             await SendMessage(msg);
         }
 
-        public async Task SendAppCardMessage(string conversationId, AppCard appCard)
+        public async Task SendAppCardMessage(string conversationId, AppCard appCard, string messageId = null)
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -172,12 +172,12 @@ namespace MixinSdk
 
 
         public async Task SendImageMessage(ClientWebSocket clientWebSocket, Attachment attachment, string conversationId, string imageUri,
-                                            string mimeType, int width, int height, long size, string thumbnail)
+                                            string mimeType, int width, int height, long size, string thumbnail, string messageId = null)
         {
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -202,12 +202,12 @@ namespace MixinSdk
         }
 
         public async Task SendDataMessage(ClientWebSocket clientWebSocket, Attachment attachment, string conversationId, string imageUri,
-                                            string mimeType, long size, string name)
+                                            string mimeType, long size, string name, string messageId = null)
         {
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -230,12 +230,12 @@ namespace MixinSdk
         }
 
         public async Task SendVideoMessage(ClientWebSocket clientWebSocket, Attachment attachment, string conversationId, string imageUri,
-                                            string mimeType, int width, int height, long duration, long size, string thumbnail)
+                                            string mimeType, int width, int height, long duration, long size, string thumbnail, string messageId = null)
         {
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
@@ -261,21 +261,26 @@ namespace MixinSdk
         }
 
 
-        public async Task SendListPendingMessage()
+        public async Task SendListPendingMessage(string messageId = null)
         {
             await SendMessage(new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "LIST_PENDING_MESSAGES"
             });
         }
 
-
-        public async Task SendMessageResponse(string msgid)
+        /// <summary>
+        /// Sends the message response.
+        /// </summary>
+        /// <returns>The message response.</returns>
+        /// <param name="msgid">Message ID that you changed status</param>
+        /// <param name="messageId">This message's id</param>
+        public async Task SendMessageResponse(string msgid, string messageId = null)
         {
             await SendMessage(new WebSocketMessage
             {
-                id = Guid.NewGuid().ToString(),
+                id = messageId ?? Guid.NewGuid().ToString(),
                 action = "ACKNOWLEDGE_MESSAGE_RECEIPT",
                 @params = new Params
                 {
@@ -284,6 +289,8 @@ namespace MixinSdk
                 }
             });
         }
+
+
         public async Task StartRecive()
         {
             var buffer = new byte[4096 * 2];
@@ -333,5 +340,4 @@ namespace MixinSdk
             onClosed?.Invoke(this, null);
         }
     }
-
 }
