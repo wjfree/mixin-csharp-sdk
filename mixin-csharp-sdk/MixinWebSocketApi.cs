@@ -80,13 +80,13 @@ namespace MixinSdk
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params {
                     conversation_id = conversationId,
                     category = "PLAIN_TEXT",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text))
                 }
             };
@@ -98,14 +98,14 @@ namespace MixinSdk
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "PLAIN_STICKER",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes("{\"name\": \"" + name + "\", \"album_id\": \"" + albumId + "\"}"))
                 }
             };
@@ -117,14 +117,14 @@ namespace MixinSdk
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "PLAIN_CONTACT",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes("{\"user_id\":\""+ userId + "\"}"))
                 }
             };
@@ -136,14 +136,14 @@ namespace MixinSdk
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "APP_BUTTON_GROUP",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(appButtons)))
                 }
             };
@@ -155,14 +155,14 @@ namespace MixinSdk
         {
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "APP_CARD",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(appCard.ToString()))
                 }
             };
@@ -177,14 +177,14 @@ namespace MixinSdk
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "PLAIN_IMAGE",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
 
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(new MsgAttachment
                     {
@@ -207,14 +207,14 @@ namespace MixinSdk
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "PLAIN_DATA",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
 
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(new MsgAttachment
                     {
@@ -235,14 +235,14 @@ namespace MixinSdk
 
             WebSocketMessage msg = new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "CREATE_MESSAGE",
                 @params = new Params
                 {
                     conversation_id = conversationId,
                     category = "PLAIN_VIDEO",
                     status = "SENT",
-                    message_id = Guid.NewGuid().ToString(),
+                    message_id = messageId ?? Guid.NewGuid().ToString(),
 
                     data = Convert.ToBase64String(Encoding.UTF8.GetBytes(new MsgAttachment
                     {
@@ -261,26 +261,20 @@ namespace MixinSdk
         }
 
 
-        public async Task SendListPendingMessage(string messageId = null)
+        public async Task SendListPendingMessage()
         {
             await SendMessage(new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "LIST_PENDING_MESSAGES"
             });
         }
 
-        /// <summary>
-        /// Sends the message response.
-        /// </summary>
-        /// <returns>The message response.</returns>
-        /// <param name="msgid">Message ID that you changed status</param>
-        /// <param name="messageId">This message's id</param>
-        public async Task SendMessageResponse(string msgid, string messageId = null)
+        public async Task SendMessageResponse(string msgid)
         {
             await SendMessage(new WebSocketMessage
             {
-                id = messageId ?? Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString(),
                 action = "ACKNOWLEDGE_MESSAGE_RECEIPT",
                 @params = new Params
                 {

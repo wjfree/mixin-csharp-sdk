@@ -102,18 +102,18 @@ namespace mixin_sdk_test
             }
 
             Console.WriteLine("\n\n======== Test Create Address ===========\n");
-            var addr = mixinApi.CreateAddress("965e5c6e-434c-3fa9-b780-c50f43cd955c", "0xe6Bf2C2E8f3243dF46308ca472038eA9Fa1bc42C", "CNB withdraw", null, null, USRCONFIG.PinCode);
-            Console.WriteLine(addr);
+            //var addr = mixinApi.CreateAddress("965e5c6e-434c-3fa9-b780-c50f43cd955c", "0xe6Bf2C2E8f3243dF46308ca472038eA9Fa1bc42C", "CNB withdraw", null, null, USRCONFIG.PinCode);
+            //Console.WriteLine(addr);
 
             Console.WriteLine("\n\n======== Test Create Address ===========\n");
-            addr = mixinApi.CreateAddress("965e5c6e-434c-3fa9-b780-c50f43cd955c", "0x078C5AF6C8Ab533b8ef7FAb822B5B5f70A9d1c35", "CNB withdraw123", null, null, USRCONFIG.PinCode);
-            Console.WriteLine(addr);
+            //addr = mixinApi.CreateAddress("965e5c6e-434c-3fa9-b780-c50f43cd955c", "0x078C5AF6C8Ab533b8ef7FAb822B5B5f70A9d1c35", "CNB withdraw123", null, null, USRCONFIG.PinCode);
+            //Console.WriteLine(addr);
 
             Console.WriteLine("\n\n======== Test Read Address ===========\n");
-            Console.WriteLine(mixinApi.ReadAddress(addr.address_id));
+            //Console.WriteLine(mixinApi.ReadAddress(addr.address_id));
 
             Console.WriteLine("\n\n======== Test Delete Address ===========\n");
-            Console.WriteLine(mixinApi.DeleteAddress(USRCONFIG.PinCode, addr.address_id));
+            //Console.WriteLine(mixinApi.DeleteAddress(USRCONFIG.PinCode, addr.address_id));
 
             Console.WriteLine("\n\n======== Test Withdrawal Addresses ===========\n");
             var addrlist = mixinApi.WithdrawalAddresses("965e5c6e-434c-3fa9-b780-c50f43cd955c");
@@ -124,7 +124,7 @@ namespace mixin_sdk_test
             }
 
             Console.WriteLine("\n\n======== Test Withdrawal  ===========\n");
-            Console.WriteLine(mixinApi.Withdrawal(addrlist[0].address_id, "100", USRCONFIG.PinCode, System.Guid.NewGuid().ToString(), "Test withdraw"));
+            //Console.WriteLine(mixinApi.Withdrawal(addrlist[0].address_id, "100", USRCONFIG.PinCode, System.Guid.NewGuid().ToString(), "Test withdraw"));
 
 
             Console.WriteLine("\n\n======== Test Search User  ===========\n");
@@ -135,7 +135,7 @@ namespace mixin_sdk_test
             Console.WriteLine(mixinApi.ReadUser("cf0b9c0e-a80a-4044-a6dc-797400c148d7"));
 
             Console.WriteLine("\n\n======== Test Transfer  ===========\n");
-            Console.WriteLine(mixinApi.Transfer("965e5c6e-434c-3fa9-b780-c50f43cd955c", "cf0b9c0e-a80a-4044-a6dc-797400c148d7", "100", USRCONFIG.PinCode, System.Guid.NewGuid().ToString(), "Test Transfer"));
+            //Console.WriteLine(mixinApi.Transfer("965e5c6e-434c-3fa9-b780-c50f43cd955c", "cf0b9c0e-a80a-4044-a6dc-797400c148d7", "100", USRCONFIG.PinCode, System.Guid.NewGuid().ToString(), "Test Transfer"));
 
 
             Console.WriteLine("\n\n======== Test Verify Payment ===========\n");
