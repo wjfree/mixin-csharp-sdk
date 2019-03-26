@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
 using RestSharp;
@@ -494,24 +495,29 @@ namespace MixinSdk
         public async Task<List<Snapshot>> NetworkSnapshotsAsync(int limit, string offset, string assetId, string order, bool isAuth)
         {
             string req = "/network/snapshots";
+            req += "?limit=" + limit.ToString();
+
+            string reqForAuthToken = req;
+            req += "&offset=" + offset;
+            reqForAuthToken += "&offset=" + HttpUtility.UrlEncode(offset);
+
+            req += "&asset=" + assetId;
+            req += "&order=" + order;
+
+            reqForAuthToken += "&asset=" + assetId;
+            reqForAuthToken += "&order=" + order;
+
+
+
 
             var request = new RestRequest(req, Method.GET);
 
             request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("limit", limit, ParameterType.QueryString);
-            request.AddParameter("offset", offset, ParameterType.QueryString);
-            if (!string.IsNullOrEmpty(assetId))
-            {
-                request.AddParameter("asset", assetId);
-            }
-            if (!string.IsNullOrEmpty(order))
-            {
-                request.AddParameter("order", order);
-            }
+            request.AddHeader("Content-length", "0");
 
             if (isAuth)
             {
-                string token = MixinUtils.GenJwtAuthCode("GET", req, "", userConfig.ClientId, userConfig.SessionId, priKey);
+                string token = MixinUtils.GenJwtAuthCode("GET", reqForAuthToken, "", userConfig.ClientId, userConfig.SessionId, priKey);
 
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);
