@@ -517,7 +517,7 @@ namespace MixinSdk
 
             if (isAuth)
             {
-                string token = MixinUtils.GenJwtAuthCode("GET", reqForAuthToken, "", userConfig.ClientId, userConfig.SessionId, priKey);
+                string token = MixinUtils.GenJwtAuthCode("GET", reqForAuthToken, "", userConfig.ClientId, userConfig.SessionId, userConfig.PrivateKey);
 
                 var jwtAuth = new RestSharp.Authenticators.JwtAuthenticator(token);
                 jwtAuth.Authenticate(client, request);

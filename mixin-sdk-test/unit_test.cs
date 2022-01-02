@@ -21,6 +21,10 @@ namespace mixin_sdk_test
 
             Console.WriteLine("======== Initiation Finished ========= \n");
 
+            Console.WriteLine("\n\n======== Test Verify PIN ===========\n");
+
+            Console.WriteLine(mixinApi.VerifyPIN(USRCONFIG.PinCode).ToString());
+
             Console.WriteLine("======== Test Create PIN ===========\n");
 
             //Console.WriteLine(mixinApi.CreatePIN(USRCONFIG.PinCode, "123456").ToString());
@@ -28,10 +32,6 @@ namespace mixin_sdk_test
             Console.WriteLine();
 
             //Console.WriteLine(mixinApi.CreatePIN("123456", USRCONFIG.PinCode).ToString());
-
-            Console.WriteLine("\n\n======== Test Verify PIN ===========\n");
-
-            //Console.WriteLine(mixinApi.VerifyPIN(USRCONFIG.PinCode).ToString());
 
 
             Console.WriteLine("\n\n======== Test Deposit ===========\n");

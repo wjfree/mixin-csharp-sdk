@@ -1,15 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using MixinSdk.Bean;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Security;
 using RestSharp;
+using NeoSmart.Utils;
+using Rebex.Security.Cryptography;
 
 namespace MixinSdk
 {
@@ -25,8 +22,6 @@ namespace MixinSdk
         public int ReadTimeout { get; set; } = 10000;
 
         private MixinUserConfig userConfig = new MixinUserConfig();
-        private RSACryptoServiceProvider priKey;
-        private RsaPrivateCrtKeyParameters rsaParameters;
         private bool isInited = false;
         private RestClient client = new RestClient(MIXIN_API_URL);
 
@@ -54,13 +49,6 @@ namespace MixinSdk
             userConfig.PinToken = PinToken;
             userConfig.PrivateKey = PrivateKey;
 
-            PemReader pemReader = new PemReader(new StringReader(PrivateKey));
-            AsymmetricCipherKeyPair pk = (AsymmetricCipherKeyPair)pemReader.ReadObject();
-            rsaParameters = (RsaPrivateCrtKeyParameters)pk.Private;
-
-            priKey = new RSACryptoServiceProvider();
-            priKey.ImportParameters(DotNetUtilities.ToRSAParameters(rsaParameters));
-
             isInited = true;
         }
 
@@ -73,17 +61,17 @@ namespace MixinSdk
 
         private string GenGetJwtToken(string uri, string body)
         {
-            return MixinUtils.GenJwtAuthCode("GET", uri, body, userConfig.ClientId, userConfig.SessionId, priKey);
+            return MixinUtils.GenJwtAuthCode("GET", uri, body, userConfig.ClientId, userConfig.SessionId, userConfig.PrivateKey);
         }
 
         private string GenPostJwtToken(string uri, string body)
         {
-            return MixinUtils.GenJwtAuthCode("POST", uri, body, userConfig.ClientId, userConfig.SessionId, priKey);
+            return MixinUtils.GenJwtAuthCode("POST", uri, body, userConfig.ClientId, userConfig.SessionId, userConfig.PrivateKey);
         }
 
         private string GenEncrypedPin(string pin)
         {
-            return MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, rsaParameters, getIterator());
+            return MixinUtils.GenEncrypedPin(pin, userConfig.PinToken, userConfig.SessionId, userConfig.PrivateKey, getIterator());
         }
 
         private async Task<string> doPostRequestAsync(string uri, object o, bool isNeedAuth, string token = null)
