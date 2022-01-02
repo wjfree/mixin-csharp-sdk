@@ -30,7 +30,7 @@ Include Mixin network api, messager api and websocket api.</Description>
     <PackageReference Include="Rebex.Elliptic.Ed25519" Version="1.2.1" />
     <PackageReference Include="UrlBase64" Version="0.1.2" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-    <PackageReference Include="curve25519-dotnet" Version="0.5.0" />
+    <PackageReference Include="Rebex.Elliptic.Curve25519" Version="1.2.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Class1.cs" />

@@ -9,8 +9,6 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Rebex.Security.Cryptography;
 using Newtonsoft.Json;
-using curve25519;
-using org.whispersystems.curve25519;
 
 
 namespace MixinSdk
@@ -117,9 +115,10 @@ namespace MixinSdk
 
             var bPriToken3 = PrivateKeyToCurve25519(bPriToken2);
 
-            Curve25519 pkey = Curve25519.getInstance(Curve25519.BEST);
+            Curve25519 pkey = Curve25519.Create(Curve25519.Curve25519Sha256);
+            pkey.FromPrivateKey(bPriToken3);
 
-            byte[] sk = pkey.calculateAgreement(bPinToken, bPriToken3);
+            byte[] sk = pkey.GetSharedSecret(bPinToken);
 
             var bPin = Encoding.ASCII.GetBytes(pin);
             var btime = BitConverter.GetBytes(time);
