@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-sdk-test", "mixin-sdk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-csharp-sdk", "mixin-csharp-sdk\mixin-csharp-sdk.csproj", "{E9F3AE38-F754-4E64-8182-0F00F30564FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mixin-web-demo", "mixin-web-demo\mixin-web-demo.csproj", "{7B8A821C-9F1C-429A-BFED-61469C297958}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,10 +19,6 @@ Global
 		{E9F3AE38-F754-4E64-8182-0F00F30564FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9F3AE38-F754-4E64-8182-0F00F30564FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9F3AE38-F754-4E64-8182-0F00F30564FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B8A821C-9F1C-429A-BFED-61469C297958}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B8A821C-9F1C-429A-BFED-61469C297958}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B8A821C-9F1C-429A-BFED-61469C297958}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B8A821C-9F1C-429A-BFED-61469C297958}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
