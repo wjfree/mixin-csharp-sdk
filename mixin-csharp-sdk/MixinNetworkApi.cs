@@ -415,7 +415,7 @@ namespace MixinSdk
         /// <param name="traceId">Trace identifier.</param>
         public async Task<Transfer> ReadTransferAsync(string traceId)
         {
-            string req = "/transfers/trace/" + traceId;
+            string req = "/snapshots/trace/" + traceId;
 
             var rz = await doGetRequestAsync(req, true);
 
