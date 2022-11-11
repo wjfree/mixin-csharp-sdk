@@ -158,9 +158,9 @@ namespace MixinSdk
         /// <param name="accountName">Account name.</param>
         /// <param name="accountTag">Account tag.</param>
         /// <param name="pin">Pin.</param>
-        public Address CreateAddress(string assetId, string publicKey, string label, string accountName, string accountTag, string pin)
+        public Address CreateAddress(string assetId, string label, string destination, string Tag, string pin)
         {
-            return CreateAddressAsync(assetId, publicKey, label, accountName, accountTag, pin).Result;
+            return CreateAddressAsync(assetId, label, destination, Tag, pin).Result;
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace MixinSdk
         /// <param name="accountName">Account name.</param>
         /// <param name="accountTag">Account tag.</param>
         /// <param name="pin">Pin.</param>
-        public async Task<Address> CreateAddressAsync(string assetId, string publicKey, string label, string accountName, string accountTag, string pin)
+        public async Task<Address> CreateAddressAsync(string assetId, string label, string destination, string Tag, string pin)
         {
             const string req = "/addresses";
 
@@ -182,10 +182,9 @@ namespace MixinSdk
             CreateAddressReq p = new CreateAddressReq
             {
                 asset_id = assetId,
-                public_key = publicKey,
                 label = label,
-                account_name = accountName,
-                account_tag = accountTag,
+                destination = destination,
+                tag = Tag,
                 pin = pinBlock
             };
 

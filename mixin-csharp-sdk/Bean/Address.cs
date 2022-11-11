@@ -6,10 +6,9 @@ namespace MixinSdk.Bean
     {
         public string asset_id { get; set; }
         public string label { get; set; }
+        public string destination { get; set; }
+        public string tag { get; set; }
         public string pin { get; set; }
-        public string public_key { get; set; }
-        public string account_name { get; set; }
-        public string account_tag { get; set; }
 
         public override string ToString()
         {
@@ -22,10 +21,10 @@ namespace MixinSdk.Bean
         public string type { get; set; }
         public string address_id { get; set; }
         public string asset_id { get; set; }
-        public string public_key { get; set; }
-        public string account_name { get; set; }
-        public string account_tag { get; set; }
+        public string destination { get; set; }
+        public string tag { get; set; }
         public string label { get; set; }
+        public string fee_asset_id { get; set; }
         public string fee { get; set; }
         public string reserve { get; set; }
         public string dust { get; set; }
