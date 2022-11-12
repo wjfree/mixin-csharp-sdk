@@ -2,42 +2,54 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/70obdywndwo5pvc6?svg=true)](https://ci.appveyor.com/project/wjfree/mixin-csharp-sdk)
 [![nuget](https://img.shields.io/nuget/v/MixinCSharpSdk.svg)](https://www.nuget.org/packages/MixinCSharpSdk/)
 
-## Introduction
-Mixin-Csharp-Sdk is a cross-platform high performance SDK based on .Net Standard2.0 standard, which implements all the interfaces on https://developers.mixin.one/api. It has both synchronous and asynchronous interfaces, and can be used with .
+## 简介
+Mixin-Csharp-Sdk是基于.Net Standard2.1标准开发的跨平台高性能的SDK，实现了https://developers.mixin.one/api 上的全部接口。具备同步与异步接口，可使用于.net Framework/dotnet core程序集。
 
-Dependencies.
+依赖项：
 - RestSharp 106.15.0
 - Newtonsoft.Json 13.0.1
 - Portable.BouncyCastle 1.8.4
 - SharpZipLib 1.4.1
 - WebSocketProtocol 4.5.3
-
-## API usage
-
+## API的使用
 ```cs
 MixinApi mixinApi = new MixinApi();
 mixinApi.Init("client id", "client secret", "session id", "pin token", "private key");
 
+//创建PIN
 mixinApi.CreatePIN("old pin", "123456");
 
+//验证PIN
 mixinApi.VerifyPIN("pin");
 
+//获取充值地址
 mixinApi.Deposit("3596ab64-a575-39ad-964e-43b37f44e8cb");
+
+//读取资产列表
 var assets = mixinApi.ReadAssets();
+
+//读取资产
 mixinApi.ReadAsset("6cfe566e-4aad-470b-8c9a-2fd35b49c68d"));
 
+//查找资产
 assets = mixinApi.SearchAssets("CNB");
+
+//网络资产
 mixinApi.NetworkAsset("965e5c6e-434c-3fa9-b780-c50f43cd955c");
 
+//Top资产
 var topasset = mixinApi.TopAssets();
 
+//NetworkSnapshot without Auth
 mixinApi.NetworkSnapshot("85b8c435-1ef6-4f2a-85f9-8def2a852473", false));
 
+//NetworkSnapshot with Auth
 mixinApi.NetworkSnapshot("85b8c435-1ef6-4f2a-85f9-8def2a852473", true));
 
 var snaps = mixinApi.NetworkSnapshots(2, "2019-01-02T15:04:05.999999999-07:00", null, null, false);
 
 snaps = mixinApi.NetworkSnapshots(2, "2019-01-02T15:04:05.999999999-07:00", null, null, true);
+
 
 var ts = mixinApi.ExternalTransactions("6cfe566e-4aad-470b-8c9a-2fd35b49c68d", null, null, null, 10, null);
 
@@ -78,6 +90,7 @@ var friends = mixinApi.Friends();
 
 mixinApi.CreateAttachment();
 
+//创建对话
 var users = new List<ParticipantAction>();
 users.Add(new ParticipantAction { action = "ADD", role = "", user_id = u.user_id });
 mixinApi.CreateConversation("GROUP", users);
@@ -86,9 +99,10 @@ mixinApi.CreateConversation("CONTACT", users);
 
 mixinApi.ReadConversation("fd72abcd-b080-3e0e-bfea-a0b1282b4bd0");
 
+
 ```
-## WebSocket API
-WebSocket is a full-duplex communication, so the API uses asynchronous calls to call the specific usage as follows.
+## WebSocket API说明
+WebSocket是全双工的通讯，因此在API使用了异步调用的方式来调用具体用法如下：
 ```cs
 await mixinApi.WebSocketConnect(HandleOnRecivedMessage, HandleOnOpened, HandleOnClosed);
 
@@ -103,24 +117,25 @@ static void HandleOnRecivedMessage(object sender, EventArgs args, string message
 
 static void HandleOnOpened(object sender, EventArgs args)
 {
-    System.Console.WriteLine("Opened~");
+    System.Console.WriteLine("Opened~~");
 }
 static void HandleOnClosed(object sender, EventArgs args)
 {
-    System.Console.WriteLine("Closed~");
+    System.Console.WriteLine("Closed~~");
 }
 ```
-## Reading other users' information
-The following steps are required to read the user's personal information.
-- Build an extranet web service for receiving callbacks from customers
-- Configure the above callback address in the app's configuration center! [][1]
-- Call the GetOAuthString method to get the authentication address and send it to the other party, or have the user click on it in your web page
-- After the user confirms, the web service will receive a code string, call the GetClientAuthToken method to get the token of the user
-- Pass in the token when calling the Api
+## 读取其他用户信息
+需要以下步骤来读取用户的个人信息：
+- 搭建一个外网的web service，用于接收客户的回调信息
+- 在APP的配置中心配置上述的回调地址![][1]
+- 调用 GetOAuthString 方法获取认证地址，发送给对方，或在你的网页中让用户点击
+- 用户确认后，web service会收到一串code，调用GetClientAuthToken方法可以获取到该用户的token
+- 调用Api时传入token
 	 
 ```cs
 ReadProfile(token);
 Deposit(token);
 ```
+
 
 [1]:	https://i.loli.net/2019/02/07/5c5be23b2a5e5.png "配置图"
